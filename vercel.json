@@ -1,0 +1,10 @@
+{
+  "framework": null,
+  "buildCommand": "",
+  "installCommand": "",
+  "outputDirectory": "dist",
+  "headers": [
+    { "source": "/vendor/(.*)\\.wasm", "headers": [{ "key": "Content-Type", "value": "application/wasm" }] },
+    { "source": "/(.*)\\.mjs", "headers": [{ "key": "Content-Type", "value": "application/javascript" }] }
+  ]
+}

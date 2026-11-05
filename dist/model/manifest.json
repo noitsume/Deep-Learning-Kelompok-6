@@ -1,0 +1,47 @@
+{
+  "name": "D-Fire \u00b7 Kelompok 6",
+  "notebook": "Kandidat_2_Fokus.ipynb",
+  "run": "hasil_20261104_163407",
+  "height": 128,
+  "width": 192,
+  "classes": [
+    "asap",
+    "api"
+  ],
+  "threshold": 0.2,
+  "nms_iou": 0.5,
+  "nms_candidate_threshold": 0.01,
+  "max_detections": 100,
+  "box_std": [
+    0.1,
+    0.1,
+    0.2,
+    0.2
+  ],
+  "preprocessing": "RGB \u2192 bilinear 192\u00d7128 \u2192 float32 (0\u2013255)",
+  "accuracy_test": 0.9050162563864376,
+  "confusion_matrix": [
+    [
+      1876,
+      129
+    ],
+    [
+      280,
+      2021
+    ]
+  ],
+  "test_images": 4306,
+  "parameters": 2312253,
+  "source_sha256": "b779e52e567139ba7f2c7df2b793ae716e6f8eccc390daecbe68ea4cd27882cc",
+  "notebook_sha256": "2808052faf6006f7f2dceea07c7b3027e5eee438940e2f6dbe56a8153b5a720b",
+  "onnx_sha256": "5bd6c8b58299dac1e4f030c69a8da43034cc92c65efccdb7ef619d79981b7af6",
+  "model_bytes": 9147112,
+  "export": {
+    "tensorflow": "2.19.0",
+    "tf2onnx": "1.17.0",
+    "onnxruntime": "1.31.1",
+    "opset": 17,
+    "precision": "float32",
+    "retrained": false
+  }
+}

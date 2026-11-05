@@ -1,0 +1,11 @@
+.venv-export/
+.qa/
+node_modules/
+*.zip
+*.log
+.env*
+!.env.example
+__pycache__/
+.openai/
+.vercel/
+*.tar.gz

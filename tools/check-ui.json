@@ -1,0 +1,61 @@
+{
+  "browser": "Chrome, viewport ponsel 390×844, 2026-11-06",
+  "accepted": "5 foto",
+  "rejected": "ditolak.jxl: format belum didukung. Gunakan JPG, PNG, atau WebP.\nkosong.png: berkas kosong atau melebihi 20 MB.",
+  "summary": "4 selesai · 2 indikasi · 2 tanpa indikasi · 1 gagal",
+  "rows": [
+    "01api.jpgAda indikasi",
+    "02rusak.jpgGagal diproses",
+    "03nama-sama.webpTidak ada indikasi",
+    "04kucing.jpegAda indikasi",
+    "05nama-sama.webpTidak ada indikasi"
+  ],
+  "exportName": "d-fire-hasil-2026-11-05.json",
+  "exportStatus": [
+    {
+      "index": 1,
+      "file": "api.jpg",
+      "status": "done",
+      "label": "Ada indikasi kebakaran"
+    },
+    {
+      "index": 2,
+      "file": "rusak.jpg",
+      "status": "error",
+      "label": null
+    },
+    {
+      "index": 3,
+      "file": "nama-sama.webp",
+      "status": "done",
+      "label": "Tidak ada indikasi kebakaran"
+    },
+    {
+      "index": 4,
+      "file": "kucing.jpeg",
+      "status": "done",
+      "label": "Ada indikasi kebakaran"
+    },
+    {
+      "index": 5,
+      "file": "nama-sama.webp",
+      "status": "done",
+      "label": "Tidak ada indikasi kebakaran"
+    }
+  ],
+  "toggleChangesImage": true,
+  "imageDownload": {
+    "name": "01-api-prediksi.png",
+    "type": "image/png",
+    "size": 2576603
+  },
+  "filteredNegative": 2,
+  "errorDetail": "Foto tidak dapat dibaca. Pastikan isinya benar-benar JPG, PNG, atau WebP.",
+  "cancelled": "Dihentikan. Hasil yang selesai tetap ada; antrean dapat dilanjutkan.",
+  "pendingAfterCancel": [
+    "Menunggu",
+    "Menunggu"
+  ],
+  "resumed": "2 selesai · 1 indikasi · 1 tanpa indikasi",
+  "noHorizontalOverflow": true
+}

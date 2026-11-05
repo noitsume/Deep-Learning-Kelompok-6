@@ -1,0 +1,122 @@
+{
+  "browser": "Chrome via DevTools, Windows, 2026-11-06",
+  "runtime": "onnxruntime-web 1.31.1 / WASM single thread",
+  "tested": 12,
+  "maxScoreError": 0.0000033154549405889355,
+  "cases": [
+    {
+      "file": "IMG-20260824-WA0016.jpg",
+      "rawMaxError": 0.00002288818359375,
+      "scoreMaxError": 0.000003274556333698886,
+      "boxes": 11,
+      "classesMatch": true,
+      "browserDecode": {
+        "maxPixelError": 0,
+        "changedChannels": 0,
+        "scores": [
+          0.4727213978767395,
+          0.33730095624923706
+        ],
+        "boxes": 11,
+        "classesMatch": true
+      }
+    },
+    {
+      "file": "hari-pohon-sedunia.webp",
+      "rawMaxError": 0.0000400543212890625,
+      "scoreMaxError": 8.105180077100371e-7,
+      "boxes": 0,
+      "classesMatch": true,
+      "browserDecode": {
+        "maxPixelError": 0,
+        "changedChannels": 0,
+        "scores": [
+          0.05946556106209755,
+          0.1057388037443161
+        ],
+        "boxes": 0,
+        "classesMatch": true
+      }
+    },
+    {
+      "file": "images3.jpeg",
+      "rawMaxError": 0.000019550323486328125,
+      "scoreMaxError": 0.0000011203707351858938,
+      "boxes": 1,
+      "classesMatch": true,
+      "browserDecode": {
+        "maxPixelError": 0,
+        "changedChannels": 0,
+        "scores": [
+          0.21585334837436676,
+          0.09281483292579651
+        ],
+        "boxes": 1,
+        "classesMatch": true
+      }
+    },
+    {
+      "file": "AoF06723.jpg",
+      "rawMaxError": 0.000041365623474121094,
+      "scoreMaxError": 0.0000011184887614423822,
+      "boxes": 0,
+      "classesMatch": true
+    },
+    {
+      "file": "AoF07261.jpg",
+      "rawMaxError": 0.00003409385681152344,
+      "scoreMaxError": 0.0000011939419397449802,
+      "boxes": 0,
+      "classesMatch": true
+    },
+    {
+      "file": "AoF07799.jpg",
+      "rawMaxError": 0.00008392333984375,
+      "scoreMaxError": 0.0000028575450885526266,
+      "boxes": 3,
+      "classesMatch": true
+    },
+    {
+      "file": "AoF08337.jpg",
+      "rawMaxError": 0.00009441375732421875,
+      "scoreMaxError": 0.0000018514101576966313,
+      "boxes": 0,
+      "classesMatch": true
+    },
+    {
+      "file": "WEB09653.jpg",
+      "rawMaxError": 0.0000896453857421875,
+      "scoreMaxError": 7.571623971552865e-7,
+      "boxes": 0,
+      "classesMatch": true
+    },
+    {
+      "file": "WEB10191.jpg",
+      "rawMaxError": 0.00003528594970703125,
+      "scoreMaxError": 2.405317479498015e-7,
+      "boxes": 0,
+      "classesMatch": true
+    },
+    {
+      "file": "WEB10729.jpg",
+      "rawMaxError": 0.00005626678466796875,
+      "scoreMaxError": 0.0000029478041669861454,
+      "boxes": 13,
+      "classesMatch": true
+    },
+    {
+      "file": "WEB11267.jpg",
+      "rawMaxError": 0.000037670135498046875,
+      "scoreMaxError": 0.0000033154549405889355,
+      "boxes": 1,
+      "classesMatch": true
+    },
+    {
+      "file": "WEB11806.jpg",
+      "rawMaxError": 0.000026464462280273438,
+      "scoreMaxError": 0.000003140199882456507,
+      "boxes": 5,
+      "classesMatch": true
+    }
+  ]
+}

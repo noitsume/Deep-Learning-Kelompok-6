@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#faf9f6">
+  <meta name="description" content="Coba model D-Fire Kelompok 6. Unggah banyak foto, lihat prediksi indikasi kebakaran dan kotak api/asap langsung di browser, tanpa login.">
+  <title>D-Fire — Prediksi Indikasi Kebakaran</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script>try{document.documentElement.dataset.theme=localStorage.getItem('dfire-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch{}</script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Lewati ke konten</a>
+  <svg class="icon-library" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-flame" viewBox="0 0 24 24"><path d="M13 2c1 6-3 6-2 10 2-1 3-3 3-5 6 6 6 11 2 14-4 3-11 1-12-4C3 11 10 8 13 2Z"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 5C8 2 5 3 3 4v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-2-1-5-2-9 1Zm0 0v15"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v1"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4 19 5"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 15.5A9 9 0 0 1 8.5 4 9 9 0 1 0 20 15.5Z"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M4 15v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1"/><path d="m3 17 5-5 4 4 4-6 5 7"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v13m-5-5 5 5 5-5M4 17v4h16v-4"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6l8-3Z"/><path d="m8 12 3 3 5-6"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  </svg>
+  <aside class="sidebar">
+    <a class="brand" href="#prediksi" aria-label="D-Fire beranda"><span class="brand-icon"><svg class="icon"><use href="#i-flame"/></svg></span><span>D-Fire<span class="brand-sub">KELOMPOK 6</span></span></a>
+    <div class="nav-label">WORKSPACE</div>
+    <nav aria-label="Navigasi utama">
+      <a class="nav-item active" href="#prediksi" data-page="prediksi" aria-label="Prediksi foto" title="Prediksi foto"><svg class="icon" aria-hidden="true"><use href="#i-grid"/></svg><span>Prediksi foto</span><span class="nav-dot"></span></a>
+      <a class="nav-item" href="#panduan" data-page="panduan" aria-label="Cara penggunaan" title="Cara penggunaan"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg><span>Cara penggunaan</span></a>
+      <a class="nav-item" href="#model" data-page="model" aria-label="Tentang model" title="Tentang model"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg><span>Tentang model</span></a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="local-note"><svg class="icon"><use href="#i-shield"/></svg><span>Foto tetap di perangkatmu<span>Diproses di browser</span></span></div>
+      <button id="themeToggle" class="theme-button" aria-label="Ganti tema"><svg class="icon"><use href="#i-moon"/></svg><span id="themeLabel">Tema gelap</span><span class="theme-switch" aria-hidden="true"></span></button>
+      <div class="sidebar-foot">Proyek Pembelajaran Mendalam<br>Kelompok 6 · 2026</div>
+    </div>
+  </aside>
+  <main id="main" tabindex="-1">
+    <header class="topbar"><span><span class="breadcrumb">Workspace</span><span class="slash">/</span><span id="pageName">Prediksi foto</span></span><span id="modelState" class="model-state"><span class="status-dot"></span>Model siap dimuat</span></header>
+    <section id="page-prediksi" class="page">
+      <div class="page-heading"><div><div class="eyebrow"><span></span> FIRE & SMOKE CLASSIFICATION</div><h1>Ada indikasi kebakaran?</h1><p>Masukkan fotomu. Lihat prediksi api dan asap dalam satu tempat.</p></div><span class="version-tag">MODEL FINAL <span>v1.0</span></span></div>
+      <div id="notice" class="notice" role="alert" hidden></div>
+      <input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" multiple class="sr-only" tabindex="-1" aria-label="Pilih foto untuk prediksi">
+      <div id="dropzone" class="dropzone">
+        <div class="upload-icon"><svg class="icon"><use href="#i-upload"/></svg></div>
+        <div class="dropzone-copy"><h2>Tarik foto ke sini, atau pilih dari perangkat</h2><p>JPG, PNG, WebP <span>·</span> Maks. 20 MB per foto <span>·</span> 25 foto sekaligus</p></div>
+        <button id="chooseFiles" class="button secondary"><svg class="icon"><use href="#i-plus"/></svg>Pilih foto</button>
+      </div>
+      <div class="workspace-toolbar"><div class="queue-heading"><h2>Ruang prediksi</h2><span id="totalBadge" class="count-badge">0 foto</span></div><div class="toolbar-actions"><button id="clearAll" class="text-button" disabled>Kosongkan</button><button id="exportAll" class="text-button" disabled><svg class="icon"><use href="#i-download"/></svg>Ekspor hasil</button><button id="runButton" class="button primary" disabled>Mulai prediksi<svg class="icon"><use href="#i-arrow"/></svg></button></div></div>
+      <div id="progressPanel" class="progress-panel" hidden>
+        <div class="progress-title"><span id="progressText" role="status" aria-live="polite">Menyiapkan model…</span><button id="stopButton" class="text-button">Hentikan</button></div>
+        <progress id="batchProgress" max="1" value="0" aria-label="Jumlah foto selesai"></progress>
+        <div class="progress-bottom"><ol id="phaseList"><li data-phase="model">Model</li><li data-phase="decode">Baca foto</li><li data-phase="preprocess">Preprocessing</li><li data-phase="inference">Prediksi</li><li data-phase="boxes">Hasil</li></ol><span id="progressCount">0 / 0 foto</span></div>
+      </div>
+      <div class="workbench">
+        <section class="queue-pane" aria-label="Antrean foto">
+          <div class="queue-top"><span>DAFTAR FOTO</span><select id="filter" aria-label="Filter hasil"><option value="all">Semua</option><option value="positive">Ada indikasi</option><option value="negative">Tanpa indikasi</option><option value="pending">Belum selesai</option><option value="error">Gagal</option></select></div>
+          <div id="queue" class="queue-list"><div class="queue-empty"><svg class="icon"><use href="#i-image"/></svg><p>Belum ada foto</p><span>Foto yang kamu pilih akan<br>muncul berurutan di sini.</span></div></div>
+          <div id="queueSummary" class="queue-summary"><span class="small-dot"></span>Menunggu foto pertama</div>
+        </section>
+        <section class="viewer-pane" aria-label="Pratinjau dan hasil prediksi">
+          <div id="viewerEmpty" class="viewer-empty"><div class="scan-illustration" aria-hidden="true"><span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span><svg class="icon"><use href="#i-image"/></svg><span class="scan-line"></span></div><h2>Mulai dari sebuah foto.</h2><p>Hasil prediksi dan lokasi indikasi akan<br>ditampilkan di sini setelah proses selesai.</p><div class="empty-tags"><span><i class="legend-dot fire"></i>Api</span><span><i class="legend-dot smoke"></i>Asap</span><span><i class="legend-dot neutral"></i>Tanpa indikasi</span></div></div>
+          <div id="viewerContent" hidden>
+            <div class="viewer-toolbar"><div class="selected-name"><span id="selectedIndex" class="index-label">01</span><span id="selectedName"></span></div><div class="viewer-nav"><button id="prevPhoto" class="icon-button" aria-label="Foto sebelumnya"><svg class="icon flip"><use href="#i-chevron"/></svg></button><button id="nextPhoto" class="icon-button" aria-label="Foto berikutnya"><svg class="icon"><use href="#i-chevron"/></svg></button></div></div>
+            <div class="canvas-stage"><canvas id="imageCanvas" aria-label="Foto yang dipilih dan kotak hasil prediksi"></canvas><p id="imageError" hidden></p><span id="imageDimensions" class="image-dimensions"></span></div>
+            <div class="image-actions"><div class="segmented" aria-label="Tampilan foto"><button id="showResult" class="selected" aria-pressed="true">Hasil prediksi</button><button id="showOriginal" aria-pressed="false">Foto asli</button></div><button id="saveImage" class="text-button" disabled><svg class="icon"><use href="#i-download"/></svg>Unduh tampilan</button></div>
+            <div id="resultPanel" class="result-panel"></div>
+          </div>
+        </section>
+      </div>
+      <div class="workspace-footer"><span><svg class="icon"><use href="#i-shield"/></svg>Tanpa akun. Foto tidak dikirim ke server.</span><span>Model dapat salah. Periksa kembali hasil prediksinya.</span></div>
+    </section>
+    <section id="page-panduan" class="page reading-page" hidden>
+      <div class="eyebrow"><span></span> MULAI DI SINI</div><h1>Fotomu, lalu hasilnya.</h1><p class="lead">Tidak perlu menyiapkan dataset atau menjalankan training. Cukup pilih foto yang ingin kamu coba.</p>
+      <div class="guide-steps"><article><span class="step-number">01</span><div><h2>Pilih satu atau beberapa foto</h2><p>Klik <b>Pilih foto</b> atau tarik foto ke area unggahan. JPG, PNG, dan WebP didukung, maksimal 25 foto dalam antrean, 20 MB dan 40 megapiksel per foto. Tiap foto mendapat nomor agar mudah dibandingkan.</p></div></article><article><span class="step-number">02</span><div><h2>Jalankan prediksi</h2><p>Klik <b>Mulai prediksi</b>. Saat pertama dipakai, browser mengunduh model dan runtime. Setelah itu, foto dibaca, diubah ke RGB berukuran 192 × 128, lalu masuk ke model. Indikator menampilkan tahap yang sedang dikerjakan.</p><p>Foto diproses bergantian. Kecepatannya mengikuti kemampuan perangkat. Tombol <b>Hentikan</b> membatalkan proses aktif; hasil yang sudah selesai tetap ada dan antrean bisa dilanjutkan.</p></div></article><article><span class="step-number">03</span><div><h2>Periksa hasil setiap foto</h2><p>Pilih foto di daftar untuk melihat label dan kotaknya. Oranye menandai api, biru menandai asap. Semua kotak yang lolos untuk kelas yang sama dibungkus menjadi satu kotak tampilan. Karena itu, maksimal ada dua kotak.</p><p><b>Foto asli</b> menyembunyikan kotak untuk perbandingan. Gunakan filter untuk mencari foto dengan indikasi, tanpa indikasi, atau yang gagal diproses.</p></div></article><article><span class="step-number">04</span><div><h2>Simpan hasil jika diperlukan</h2><p><b>Unduh tampilan</b> menyimpan foto yang sedang terlihat beserta kotaknya dalam PNG, dengan sisi terpanjang maksimal 1.800 piksel. <b>Ekspor hasil</b> menyimpan JSON berisi nama foto, label, skor, koordinat, dan identitas model.</p><p>Foto dan hasil tidak disimpan sebagai riwayat. Saat halaman ditutup atau dimuat ulang, pilih foto kembali. Tidak ada foto yang diunggah ke server.</p></div></article></div>
+      <a class="button primary" href="#prediksi">Coba prediksi<svg class="icon"><use href="#i-arrow"/></svg></a>
+    </section>
+    <section id="page-model" class="page reading-page" hidden>
+      <div class="eyebrow"><span></span> TENTANG PROYEK</div><h1>Model yang kami gunakan.</h1><p class="lead">Klasifikasi Biner Adanya Indikasi Kebakaran atau Tidak Pada Citra.</p>
+      <div class="model-intro"><span class="model-mark"><svg class="icon"><use href="#i-flame"/></svg></span><div><h2>CNN dengan MobileNetV2</h2><p>Kelompok kami memakai bobot hasil training dan fine-tuning pada notebook <code>Kandidat_2_Fokus.ipynb</code>. Model mempelajari kelas api/asap beserta koordinat dari dataset D-Fire.</p></div></div>
+      <dl class="spec-grid"><div><dt>Masukan model</dt><dd>192 × 128 <span>piksel RGB</span></dd></div><div><dt>Akurasi biner pada data test</dt><dd>90,50% <span>dari 4.306 citra</span></dd></div><div><dt>Ambang skor</dt><dd>0,20 <span>NMS IoU 0,50</span></dd></div><div><dt>Bobot final</dt><dd>4 Nov 2026 <span>hasil retraining notebook</span></dd></div></dl>
+      <article class="explanation"><h2>Dari foto menjadi prediksi</h2><p>Foto dibaca sebagai RGB, di-resize dengan bilinear menjadi 192 × 128, lalu diubah ke float32 dalam rentang 0–255. Tidak ada Gaussian blur atau CLAHE tambahan. Cabang kontras lokal dan normalisasi MobileNet sudah menjadi bagian di dalam model.</p><p>Model menghasilkan skor api/asap dan perubahan koordinat anchor. NMS menyaring kotak yang bertumpuk. Jika ada kotak dengan skor minimal 0,20 yang lolos, hasil binernya adalah <b>Ada indikasi</b>. Jika tidak, hasilnya <b>Tidak ada indikasi</b>.</p><h2>Apa arti kotak dan skornya?</h2><p>Kotak pada layar adalah gabungan batas terluar prediksi untuk kelas yang sama. Satu kotak besar dapat mencakup ruang di antara beberapa indikasi. Kotak ini berasal dari keluaran detektor, bukan dari CAM atau segmentasi piksel.</p><p>Skor menunjukkan keluaran model untuk kandidat objek, bukan persentase kepastian kebakaran. Akurasi 90,50% adalah hasil klasifikasi biner pada data test D-Fire; angka tersebut tidak mengukur ketepatan koordinat dan tidak menjamin hasil pada semua foto baru.</p><h2>Bobot sama, berjalan di browser</h2><p>Bobot Keras diekspor ke ONNX float32 tanpa training ulang atau kuantisasi. Perhitungan berjalan pada perangkat pengunjung melalui ONNX Runtime Web. Hasil konversi diperiksa terhadap model TensorFlow. Decoder gambar browser dapat memberi perbedaan piksel kecil, terutama pada JPEG, dibandingkan Pillow di notebook.</p><p class="source-links"><a href="https://github.com/gaia-solutions-on-demand/DFireDataset" target="_blank" rel="noopener noreferrer">Dataset D-Fire ↗</a><a href="./model/manifest.json" target="_blank" rel="noopener noreferrer">Identitas & checksum model ↗</a></p></article>
+    </section>
+    <footer class="main-footer"><span>D-FIRE <span class="footer-separator">/</span> KELOMPOK 6</span><span>Proyek UTS Pembelajaran Mendalam</span></footer>
+  </main>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

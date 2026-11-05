@@ -1,0 +1,177 @@
+{
+  "source_sha256": "b779e52e567139ba7f2c7df2b793ae716e6f8eccc390daecbe68ea4cd27882cc",
+  "onnx_sha256": "5bd6c8b58299dac1e4f030c69a8da43034cc92c65efccdb7ef619d79981b7af6",
+  "tested": 12,
+  "max_score_error": 2.950429916381836e-06,
+  "max_box_error": 1.3709068298339844e-06,
+  "cases": [
+    {
+      "index": 0,
+      "file": "IMG-20260824-WA0016.jpg",
+      "width": 1536,
+      "height": 1024,
+      "raw_max_abs_error": 2.4318695068359375e-05,
+      "score_max_abs_error": 2.8014183044433594e-06,
+      "box_max_abs_error": 8.344650268554688e-07,
+      "same_detections": true,
+      "expected_scores": [
+        0.4727189838886261,
+        0.33730095624923706
+      ]
+    },
+    {
+      "index": 1,
+      "file": "hari-pohon-sedunia.webp",
+      "width": 696,
+      "height": 464,
+      "raw_max_abs_error": 2.682209014892578e-05,
+      "score_max_abs_error": 4.991888999938965e-07,
+      "box_max_abs_error": 0.0,
+      "same_detections": true,
+      "expected_scores": [
+        0.05946557968854904,
+        0.10573874413967133
+      ]
+    },
+    {
+      "index": 2,
+      "file": "images3.jpeg",
+      "width": 678,
+      "height": 452,
+      "raw_max_abs_error": 2.0503997802734375e-05,
+      "score_max_abs_error": 1.1771917343139648e-06,
+      "box_max_abs_error": 5.960464477539062e-07,
+      "same_detections": true,
+      "expected_scores": [
+        0.21585385501384735,
+        0.09281501919031143
+      ]
+    },
+    {
+      "index": 3,
+      "file": "AoF06723.jpg",
+      "width": 1280,
+      "height": 720,
+      "raw_max_abs_error": 4.506111145019531e-05,
+      "score_max_abs_error": 6.668269634246826e-07,
+      "box_max_abs_error": 0.0,
+      "same_detections": true,
+      "expected_scores": [
+        0.12640628218650818,
+        0.05216686427593231
+      ]
+    },
+    {
+      "index": 4,
+      "file": "AoF07261.jpg",
+      "width": 1280,
+      "height": 720,
+      "raw_max_abs_error": 3.910064697265625e-05,
+      "score_max_abs_error": 7.152557373046875e-07,
+      "box_max_abs_error": 0.0,
+      "same_detections": true,
+      "expected_scores": [
+        0.09915713220834732,
+        0.059589844197034836
+      ]
+    },
+    {
+      "index": 5,
+      "file": "AoF07799.jpg",
+      "width": 1280,
+      "height": 720,
+      "raw_max_abs_error": 6.222724914550781e-05,
+      "score_max_abs_error": 1.9371509552001953e-06,
+      "box_max_abs_error": 3.2782554626464844e-07,
+      "same_detections": true,
+      "expected_scores": [
+        0.21552932262420654,
+        0.7842267155647278
+      ]
+    },
+    {
+      "index": 6,
+      "file": "AoF08337.jpg",
+      "width": 1280,
+      "height": 720,
+      "raw_max_abs_error": 8.106231689453125e-05,
+      "score_max_abs_error": 1.3485550880432129e-06,
+      "box_max_abs_error": 0.0,
+      "same_detections": true,
+      "expected_scores": [
+        0.1282358318567276,
+        0.04909595102071762
+      ]
+    },
+    {
+      "index": 7,
+      "file": "WEB09653.jpg",
+      "width": 640,
+      "height": 360,
+      "raw_max_abs_error": 6.389617919921875e-05,
+      "score_max_abs_error": 5.792826414108276e-07,
+      "box_max_abs_error": 0.0,
+      "same_detections": true,
+      "expected_scores": [
+        0.04196777194738388,
+        0.04294862598180771
+      ]
+    },
+    {
+      "index": 8,
+      "file": "WEB10191.jpg",
+      "width": 827,
+      "height": 591,
+      "raw_max_abs_error": 3.62396240234375e-05,
+      "score_max_abs_error": 6.444752216339111e-07,
+      "box_max_abs_error": 0.0,
+      "same_detections": true,
+      "expected_scores": [
+        0.04970456659793854,
+        0.028352105990052223
+      ]
+    },
+    {
+      "index": 9,
+      "file": "WEB10729.jpg",
+      "width": 640,
+      "height": 360,
+      "raw_max_abs_error": 7.081031799316406e-05,
+      "score_max_abs_error": 2.60770320892334e-06,
+      "box_max_abs_error": 1.3709068298339844e-06,
+      "same_detections": true,
+      "expected_scores": [
+        0.47379201650619507,
+        0.33705997467041016
+      ]
+    },
+    {
+      "index": 10,
+      "file": "WEB11267.jpg",
+      "width": 960,
+      "height": 640,
+      "raw_max_abs_error": 2.5272369384765625e-05,
+      "score_max_abs_error": 2.205371856689453e-06,
+      "box_max_abs_error": 4.172325134277344e-07,
+      "same_detections": true,
+      "expected_scores": [
+        0.8275772929191589,
+        0.12484098970890045
+      ]
+    },
+    {
+      "index": 11,
+      "file": "WEB11806.jpg",
+      "width": 800,
+      "height": 446,
+      "raw_max_abs_error": 2.3603439331054688e-05,
+      "score_max_abs_error": 2.950429916381836e-06,
+      "box_max_abs_error": 8.642673492431641e-07,
+      "same_detections": true,
+      "expected_scores": [
+        0.7097939848899841,
+        0.16537357866764069
+      ]
+    }
+  ]
+}
