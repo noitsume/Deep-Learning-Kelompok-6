@@ -2,7 +2,7 @@
 .qa/
 node_modules/
 *.zip
-!/source code/D-Fire-Kelompok-6.zip
+!/source code/Source Code.zip
 *.log
 .env*
 !.env.example

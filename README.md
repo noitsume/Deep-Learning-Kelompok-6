@@ -14,7 +14,7 @@ Model final memperoleh akurasi klasifikasi biner **90,50% pada 4.306 gambar test
 
 ## Source code notebook
 
-Unduh [D-Fire-Kelompok-6.zip](source%20code/D-Fire-Kelompok-6.zip) dari folder `source code` untuk menjalankan ulang proyek UTS. Pada halaman berkas GitHub, gunakan **Download raw file**, lalu ekstrak seluruh ZIP. Buka folder `D-Fire-Kelompok-6`, pilih kernel Python 3.11 atau 3.12 versi 64-bit, kemudian jalankan **Restart Kernel → Run All** pada `Kandidat_2_Fokus.ipynb`. Petunjuk lengkap ada di README dalam ZIP.
+Unduh [Source Code.zip](source%20code/Source%20Code.zip) dari folder `source code` untuk menjalankan ulang proyek UTS. Pada halaman berkas GitHub, gunakan **Download raw file**, lalu ekstrak seluruh ZIP. Buka folder `Kelompok 6-Source Code`, pilih kernel Python 3.11 atau 3.12 versi 64-bit, kemudian jalankan **Restart Kernel → Run All** pada `Kandidat_2_Fokus.ipynb`. Petunjuk lengkap ada di README dalam ZIP.
 
 Paket berisi notebook dengan output tersimpan, requirements, tiga foto contoh, hasil evaluasi, serta struktur `output/step5_training` sampai `output/step8_prediksi`. Dataset, bobot awal, model hasil training, isi cache, dan backup tidak disertakan. Saat Run All, notebook mengunduh dataset dan bobot awal yang belum tersedia, lalu membuat cache dan melatih model. Hasil setiap tahap menimpa berkas pada folder output yang sama.
 
@@ -31,4 +31,4 @@ Website untuk deployment Vercel tetap berada di `dist/`. ZIP ini digunakan untuk
 
 Website dapat digunakan tanpa akun. Foto diproses langsung di browser dan tidak dikirim ke server. Foto serta hasil hanya tersimpan selama halaman masih terbuka; kalau halaman dimuat ulang atau ditutup, masukkan kembali fotonya. Tema terang dan gelap dapat diganti melalui tombol pada sidebar.
 
-Untuk menjalankan website di komputer sendiri atau menyiapkan hosting, lihat [panduan deployment](DEPLOY.md). Penjelasan kode, konfigurasi model, dan hasil pemeriksaan tersedia di [catatan teknis](TECHNICAL.md).
+Untuk menjalankan website di komputer sendiri atau menyiapkan hosting, lihat [panduan deployment](DEPLOY.md). Penjelasan kode, konfigurasi model, dan hasil pemeriksaan tersedia di [catatan teknis](TECHNICAL.md). Urutan rekaman, bagian yang perlu disorot, dan batas selesai setiap poin tersedia di [panduan video](PANDUAN_VIDEO.md).

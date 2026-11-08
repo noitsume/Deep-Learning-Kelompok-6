@@ -1,0 +1,15 @@
+# Panduan video demo dan deployment
+
+Rekam sesuai urutan berikut. Tiga foto contoh tersedia dalam folder `foto_prediksi` pada **Source Code.zip**.
+
+| Poin dosen | Sorot dan jelaskan | Selesai; lanjut setelah… |
+| --- | --- | --- |
+| **i. Tampilan user interface** | Hero **UTS Kelompok 6**, judul **Klasifikasi adanya indikasi kebakaran**, menu Prediksi foto, Cara penggunaan, dan Tentang model. Tunjukkan area pilih foto, antrean, serta panel hasil. | Penonton memahami tujuan aplikasi dan letak input serta output. |
+| **ii. Contoh input dan output** | Masukkan `IMG-20260824-WA0016.jpg`, `hari-pohon-sedunia.webp`, dan `images3.jpeg`, lalu klik **Mulai prediksi**. Tunjukkan api → **Ada indikasi** (benar), pohon → **Tidak ada indikasi** (benar), dan kucing → **Ada indikasi**, terdeteksi sebagai asap (salah/false positive). Bandingkan **Foto asli** dengan **Hasil prediksi** serta jelaskan kotak dan skor. | Ada contoh benar dan salah yang terlihat, beserta alasan mengapa hasilnya dinilai demikian. |
+| **iii. Fitur unik 1: ambang skor** | Buka **Tentang model → Fitur 1**. Kotak lolos pada skor ≥0,20 setelah penyaringan NMS; minimal satu kotak menghasilkan label Ada indikasi. Pada kucing, skor asap sekitar 0,216 melewati ambang. Jelaskan hasil eksperimen: menurunkan ambang dari 0,35 ke 0,20 mengurangi kasus positif terlewat (FN) dari 791 menjadi 280, tetapi alarm salah (FP) naik dari 18 menjadi 129 pada 4.306 citra test. | Mekanisme, alasan memilih ambang, serta manfaat dan konsekuensinya sudah dijelaskan. Ambang aplikasi tetap 0,20; tidak ada slider. |
+| **iii. Fitur unik 2: inferensi di browser** | Sorot **Tentang model → Fitur 2** dan hasil prediksi tadi. Model diekspor ke ONNX float32, diunduh browser, lalu dijalankan melalui ONNX Runtime Web/WASM pada perangkat pengguna. Foto tidak diunggah ke server. Tunjukkan `tools/parity-browser.json`: 12 contoh memiliki kelas yang cocok, selisih skor maksimum sekitar 0,00000332 pada pemeriksaan konversi. | Cara kerja, manfaat privasi, dan bukti kecocokan konversi sudah ditunjukkan. Model ini tidak dikuantisasi; pemuatan pertama tetap mengunduh model/runtime. |
+| **iv. Tahapan deployment** | Tunjukkan repo GitHub, `dist/`, dan `vercel.json`; lalu pengaturan Vercel: import repo, preset **Other**, root repo, output **dist**, tanpa build/install command. Tunjukkan deployment berstatus **Ready**, alamat produksi, lalu buka alamat tersebut tanpa login dan jalankan prediksi. Training tetap dilakukan melalui notebook. | Urutan GitHub → konfigurasi → Ready → website publik dan prediksi berhasil sudah terlihat. |
+
+Skor objek bukan persentase kepastian kebakaran. Kotak merupakan gabungan batas prediksi per kelas, bukan Grad-CAM. Akurasi 90,50% berlaku pada data test D-Fire, bukan jaminan untuk setiap foto baru.
+
+Bukti ambang berasal dari eksperimen model lanjutan pada bobot yang sama: baris **Lanjutan, ambang awal** dan **Lanjutan, ambang kontrol** dalam `perbandingan_biner_test.csv`. Hasil ambang final juga terdapat di evaluasi notebook. Panduan ini merupakan bahan rekaman; video tetap perlu direkam dan tautannya dicantumkan pada laporan.
