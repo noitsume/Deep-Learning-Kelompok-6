@@ -17,6 +17,26 @@ test('Kotak tampilan membungkus semua kotak sekelas dan tidak menggabungkan api 
 });
 
 let fixturePresent=true;
+test('Union OFF tetap memakai NMS dan tidak mengubah skor atau keputusan biner',()=>{
+  const testAnchors=new Float32Array([.2,.2,.2,.2, .21,.2,.2,.2, .8,.8,.2,.2]);
+  const raw=new Float32Array([0,0,0,0,2,-10, 0,0,0,0,1,-10, 0,0,0,0,0,-10]);
+  const on=decode(raw,testAnchors,manifest);
+  const off=decode(raw,testAnchors,manifest,false);
+  assert.equal(on.detections.length,2,'NMS membuang kandidat yang bertumpuk, mempertahankan objek terpisah');
+  assert.deepEqual(off.detections,on.detections);
+  assert.deepEqual(off.maxScores,on.maxScores);
+  assert.equal(off.positive,on.positive);
+  assert.equal(on.boxes.length,1);
+  assert.equal(off.boxes.length,2);
+  assert.deepEqual(off.boxes,off.detections);
+  assert.equal(on.mergeBoxes,true); assert.equal(off.mergeBoxes,false);
+  for (const i of [4,10,16]) raw[i]=-10;
+  for (const merge of [true,false]) {
+    const negative=decode(raw,testAnchors,manifest,merge);
+    assert.equal(negative.positive,false); assert.deepEqual(negative.boxes,[]);
+  }
+});
+
 try { await access(new URL('.qa/fixtures.json',base)); } catch { fixturePresent=false; }
 test('Paritas preprocessing dan postprocessing terhadap fixture TensorFlow/Pillow', {skip:!fixturePresent}, async t=>{
   const fixtures = await json('.qa/fixtures.json');

@@ -11,7 +11,7 @@ export function iou(a, b) {
   return union > 0 ? intersection / union : 0;
 }
 
-export function decode(raw, anchors, config) {
+export function decode(raw, anchors, config, mergeBoxes = true) {
   const candidates = [[], []];
   const maxScores = [0, 0];
   for (let i = 0; i < anchors.length / 4; i++) {
@@ -45,7 +45,8 @@ export function decode(raw, anchors, config) {
   }
   const detections = selected.sort((a,b) => b.score-a.score).slice(0, config.max_detections)
     .filter(p => p.score >= config.threshold);
-  return { positive: detections.length > 0, maxScores, detections, boxes: mergeForDisplay(detections) };
+  return { positive: detections.length > 0, maxScores, detections, mergeBoxes,
+    boxes: mergeBoxes ? mergeForDisplay(detections) : detections };
 }
 
 // Penggabungan per kelas hanya untuk tampilan: maksimal satu kotak asap dan satu api.

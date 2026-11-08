@@ -46,7 +46,7 @@ async function initialize() {
   postMessage({ type:'ready', config });
 }
 
-async function predict(file, id) {
+async function predict(file, id, mergeBoxes) {
   const start = performance.now();
   phase('decode', `Membaca ${file.name}`, { id });
   let bitmap;
@@ -67,8 +67,8 @@ async function predict(file, id) {
   let outputs;
   try {
     outputs = await session.run({ [session.inputNames[0]]:tensor });
-    phase('boxes', 'Menyaring prediksi dan menggabungkan kotak per kelas…', { id });
-    const result = decode(outputs[session.outputNames[0]].data, anchors, config);
+    phase('boxes', mergeBoxes ? 'Menyaring prediksi dan menggabungkan kotak per kelas…' : 'Menyaring prediksi tanpa penggabungan kotak…', { id });
+    const result = decode(outputs[session.outputNames[0]].data, anchors, config, mergeBoxes);
     postMessage({ type:'result', id, result:{ ...result, width, height, elapsedMs:performance.now()-start } });
   } finally {
     tensor.dispose();
@@ -79,7 +79,7 @@ async function predict(file, id) {
 self.onmessage = async ({ data }) => {
   try {
     if (data.type === 'init') await initialize();
-    if (data.type === 'predict') await predict(data.file, data.id);
+    if (data.type === 'predict') await predict(data.file, data.id, data.mergeBoxes);
   } catch (error) {
     postMessage({ type:'error', id:data.id, fatal:data.type === 'init', message:error.message || 'Prediksi gagal diproses.' });
   }

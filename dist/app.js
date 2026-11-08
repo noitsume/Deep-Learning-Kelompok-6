@@ -1,7 +1,7 @@
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
 const state = { items:[], nextIndex:1, selected:null, running:false, ready:false, worker:null,
-  active:null, config:null, follow:true, showBoxes:true, bitmap:null, bitmapId:null, drawTicket:0 };
+  active:null, config:null, runOptions:{ mergeBoxes:true }, follow:true, showBoxes:true, bitmap:null, bitmapId:null, drawTicket:0 };
 const names = ['Asap','Api'];
 const colors = ['#29c8f3','#ff743e'];
 const pad = number => String(number).padStart(2, '0');
@@ -58,6 +58,7 @@ function visibleItems() {
 }
 
 function addFiles(files) {
+  if (state.running) { notice('Tunggu prediksi selesai atau hentikan proses sebelum menambahkan foto.'); return; }
   notice();
   const errors = [];
   let added = 0;
@@ -158,9 +159,12 @@ function render() {
   $('#clearAll').disabled = !state.items.length || state.running;
   $('#loadExamples').disabled = loadingExamples || state.running;
   $('#loadExamples').textContent = loadingExamples ? 'Memuat foto demo…' : 'Muat 3 foto demo';
+  $('#mergeBoxes').disabled = state.running;
+  $('#chooseFiles').disabled = state.running;
+  $('#fileInput').disabled = state.running;
   $('#exportAll').disabled = !done.length;
-  $('#runButton').disabled = state.running || !(pendingItems().length || errors);
-  $('#runButton').innerHTML = state.running ? '<span class="busy-spinner"></span>Memproses…' : `${done.length && !pendingItems().length && !errors ? 'Semua selesai' : done.length ? 'Lanjutkan' : errors && !pendingItems().length ? 'Coba ulang' : 'Mulai prediksi'}${icon('arrow')}`;
+  $('#runButton').disabled = state.running || loadingExamples || !state.items.length;
+  $('#runButton').innerHTML = state.running ? '<span class="busy-spinner"></span>Memproses…' : `${done.length || errors ? 'Prediksi ulang' : 'Mulai prediksi'}${icon('arrow')}`;
   const positive = done.filter(item=>item.result.positive).length;
   $('#queueSummary').textContent = state.items.length ? `${done.length} selesai · ${positive} indikasi · ${done.length-positive} tanpa indikasi${errors ? ` · ${errors} gagal` : ''}` : 'Menunggu foto pertama';
   $('#progressCount').textContent = `${done.length + errors} / ${state.items.length} foto`;
@@ -214,20 +218,20 @@ function processNext() {
   item.status = 'processing'; state.active = item.id;
   if (state.follow) state.selected = item.id;
   render(); renderViewer();
-  state.worker.postMessage({ type:'predict', file:item.file, id:item.id });
+  state.worker.postMessage({ type:'predict', file:item.file, id:item.id, mergeBoxes:state.runOptions.mergeBoxes });
 }
 
 $('#runButton').addEventListener('click', () => {
-  if (state.running) return;
+  if (state.running || loadingExamples || !state.items.length) return;
   if (!('Worker' in window) || !('OffscreenCanvas' in window) || !('createImageBitmap' in window) || !('WebAssembly' in window)) {
     notice('Browser ini belum mendukung mesin prediksi. Gunakan Chrome, Edge, atau Firefox versi terbaru.'); return;
   }
   notice();
-  state.items.filter(item=>item.status === 'error').forEach(item=>{ item.status = 'pending'; item.error = null; });
-  if (!pendingItems().length) return;
+  state.runOptions = { mergeBoxes:$('#mergeBoxes').checked };
+  state.items.forEach(item=>{ item.status = 'pending'; item.result = null; item.error = null; });
   state.running = true; state.follow = true; $('#filter').value = 'all';
   $('#progressPanel').hidden = false; $('#stopButton').hidden = false;
-  render();
+  render(); renderViewer();
   if (state.ready && state.worker) processNext();
   else {
     reportPhase('model','Menyiapkan model. Unduhan pertama memerlukan koneksi internet…');
@@ -241,9 +245,9 @@ function stop(announce = true) {
   const active = state.items.find(item=>item.id === state.active);
   if (active) active.status = 'pending';
   state.active = null; $('#stopButton').hidden = true;
-  reportPhase('', 'Dihentikan. Hasil yang selesai tetap ada; antrean dapat dilanjutkan.');
+  reportPhase('', 'Dihentikan. Hasil yang selesai tetap ada. Prediksi berikutnya memproses ulang seluruh antrean.');
   render(); renderViewer();
-  if (announce) toast('Proses dihentikan. Antrean siap dijalankan kembali.');
+  if (announce) toast('Proses dihentikan. Semua foto dapat diprediksi ulang.');
 }
 $('#stopButton').addEventListener('click',()=>stop());
 $('#clearAll').addEventListener('click',()=>{
@@ -320,7 +324,7 @@ function renderResult(item) {
     scores.append(score);
   }
   panel.append(scores);
-  panel.append(element('p','result-note',`Skor tertinggi per kelas, bukan persentase kepastian. Ambang: 0,20. ${result.detections.length} kotak lolos → ${result.boxes.length} kotak tampilan. Kotak sekelas digabung agar lebih mudah dilihat.`));
+  panel.append(element('p','result-note',`Skor tertinggi per kelas, bukan persentase kepastian. Ambang: 0,20. ${result.detections.length} kotak lolos → ${result.boxes.length} kotak tampilan. ${result.mergeBoxes ? 'Union ON: kotak sekelas digabung.' : 'Union OFF: kotak setelah NMS ditampilkan terpisah.'}`));
 }
 
 function drawImage() {
@@ -365,7 +369,8 @@ $('#exportAll').addEventListener('click',()=>{
   const output = {
     exported_at:new Date().toISOString(), model:state.config,
     coordinate_format:'normalized xyxy (0–1); pixel coordinates = x*width and y*height',
-    display_boxes:'Enclosing union per class, applied after NMS and score filtering',
+    prediction_options:{ merge_boxes:state.runOptions.mergeBoxes },
+    display_boxes:state.runOptions.mergeBoxes ? 'Enclosing union per class, applied after NMS and score filtering' : 'Separate detections after NMS and score filtering; no union',
     photos:state.items.map(item=>({ index:item.index, file:item.file.name, status:item.status,
       label:item.result ? (item.result.positive ? 'Ada indikasi kebakaran' : 'Tidak ada indikasi kebakaran') : null,
       result:item.result ?? null, error:item.error ?? null }))

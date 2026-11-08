@@ -19,7 +19,7 @@ Buka **http://127.0.0.1:5173/**. Folder `dist/` sudah berisi model dan runtime, 
 3. Pilih nomor foto untuk melihat hasil, gunakan filter, atau bandingkan foto asli dengan kotak prediksi.
 4. **Unduh tampilan** menghasilkan PNG. **Ekspor hasil** menghasilkan JSON berisi skor, kotak sebelum/sesudah penggabungan, status tiap foto, dan checksum model.
 
-Maksimal 25 foto dalam antrean; setiap berkas maksimal 20 MiB dan 40 megapiksel. Nama berkas boleh sama karena setiap item punya ID dan indeks sendiri. Foto diproses berurutan di Worker. Berkas rusak tidak menghentikan foto berikutnya. **Hentikan** membatalkan Worker, menyimpan hasil yang selesai, dan mengembalikan foto aktif ke antrean.
+Maksimal 25 foto dalam antrean; setiap berkas maksimal 20 MiB dan 40 megapiksel. Nama berkas boleh sama karena setiap item punya ID dan indeks sendiri. Foto diproses berurutan di Worker. Berkas rusak tidak menghentikan foto berikutnya. **Hentikan** membatalkan Worker, menyimpan hasil yang selesai, dan mengembalikan foto aktif ke antrean. Klik prediksi berikutnya memproses ulang seluruh antrean.
 
 Tema mengikuti perangkat saat pertama dibuka, lalu menyimpan pilihan terang/gelap di localStorage. Foto dan hasil hanya ada dalam memori halaman, sehingga hilang saat refresh. Browser modern dengan WebAssembly, Web Worker, `createImageBitmap`, dan OffscreenCanvas diperlukan. Uji aktual dilakukan di Chrome pada Windows; tampilan ponsel diuji melalui emulasi 390 × 844, bukan pada perangkat fisik.
 
@@ -38,9 +38,11 @@ Sumber bobot: `../kandidat_2_fokus/hasil_20261104_163407/model.keras`, hasil ret
 | STD box | `[0.1, 0.1, 0.2, 0.2]` |
 | Penyaringan | Kandidat skor ≥ 0,01 → NMS IoU 0,50 per kelas (100) → 100 terbaik global → skor ≥ 0,20 |
 | Label biner | Ada indikasi jika minimal satu kotak lolos |
-| Kotak tampilan | Enclosing union semua kotak sekelas, maksimal dua kotak |
+| Kotak tampilan | Union ON (default): enclosing union per kelas, maksimal dua kotak. OFF: semua deteksi setelah NMS dan ambang skor, tanpa union. |
 | Model web | ONNX opset 17, float32; tanpa kuantisasi/training ulang |
 | Runtime | ONNX Runtime Web 1.31.1, WASM satu thread di Dedicated Worker |
+
+Checkbox dibaca saat tombol prediksi ditekan. Semua foto di antrean direset untuk diprediksi ulang, dan pilihan `mergeBoxes` dikirim bersama setiap foto ke Worker. Daftar foto serta checkbox dikunci selama proses. Hasil menyimpan `mergeBoxes`, `detections`, dan `boxes`; ekspor JSON menyertakan konfigurasi yang benar-benar digunakan, bukan posisi checkbox yang baru diubah. PNG mengikuti kotak pada hasil tersebut.
 
 Penggabungan kotak hanya menyederhanakan tampilan, tidak mengganti skor atau keputusan model. Ini **union per kelas**, bukan NMM berbasis ambang overlap. Kotak yang berjauhan dapat menghasilkan satu kotak tampilan besar. Skor bukan probabilitas kebakaran yang telah dikalibrasi. Angka **90,50%** pada halaman Tentang Model berasal dari akurasi **biner** 4.306 citra test dalam notebook, bukan akurasi lokalisasi.
 
@@ -76,7 +78,8 @@ tests/pipeline.test.mjs    perbandingan preprocessing/postprocessing
 - Keras vs ONNX Web WASM dengan input yang sama: **12 gambar**, urutan kelas/jumlah kotak sama; selisih skor maksimum **0,00000332**.
 - Tiga foto lengkap melalui decoder Chrome: hasil RGB-resize identik dengan Pillow. Foto kebakaran menghasilkan 11 kotak → 2 kotak tampilan; foto pohon negatif; foto kucing tetap **false positive asap**, satu kotak, skor sekitar 0,216. Kesalahan ini tidak ditutup-tutupi atau dituning.
 - `npm test`: **14 pengujian lolos** pada lingkungan dengan fixture QA lokal. Fixture dibuat dari foto asli oleh skrip ekspor dan tidak dipublikasikan. Tanpa fixture lokal, tes paritas dilewati secara eksplisit; tes union tetap dijalankan.
-- UI: batch dengan gambar rusak di tengah tetap melanjutkan; nama file duplikat; format tak didukung; berkas kosong; filter; tampil/sembunyikan kotak; PNG/JSON; hentikan dan lanjutkan; tema terang/gelap; tidak ada overflow halaman pada viewport ponsel.
+- Pemeriksaan union ON/OFF: dua tes mandiri lolos, termasuk bahwa NMS tetap menyaring duplikat saat union OFF dan skor/keputusan biner tidak berubah. Tes paritas membutuhkan fixture QA lokal; saat fixture tidak tersedia, tes tersebut dilewati.
+- UI sebelumnya: batch dengan gambar rusak di tengah tetap melanjutkan; nama file duplikat; format tak didukung; berkas kosong; filter; tampil/sembunyikan kotak; PNG/JSON; hentikan dan lanjutkan; tema terang/gelap; tidak ada overflow halaman pada viewport ponsel.
 
 Pengujian paritas memastikan penerjemahan model, bukan evaluasi ulang akurasi terhadap seluruh dataset atau bukti model selalu benar pada foto baru.
 
