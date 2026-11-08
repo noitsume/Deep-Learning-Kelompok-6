@@ -1,5 +1,7 @@
 # Menjalankan dan deploy website
 
+Alamat produksi: [Klasifikasi adanya indikasi kebakaran — UTS Kelompok 6](https://klasifikasi-adanya-indikasi-kebakar.vercel.app/). Proyek Vercel: `klasifikasi-adanya-indikasi-kebakaran`, terhubung ke branch `main` repository GitHub. Deployment pertama berhasil pada 8 November 2026; akses tanpa login dan prediksi tiga foto contoh sudah diperiksa.
+
 Folder **`dist/` sudah siap disajikan sebagai website statis**. Model ONNX, anchor, dan runtime WASM sudah ikut di repository. Tidak perlu dataset training, TensorFlow, Python, API key, atau server untuk menerima unggahan foto.
 
 ## Menjalankan di komputer sendiri

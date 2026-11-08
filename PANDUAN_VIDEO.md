@@ -2,6 +2,8 @@
 
 Rekam sesuai urutan berikut. Tiga foto contoh tersedia dalam folder `foto_prediksi` pada **Source Code.zip**.
 
+Buka [website produksi](https://klasifikasi-adanya-indikasi-kebakar.vercel.app/) untuk demo.
+
 | Poin dosen | Sorot dan jelaskan | Selesai; lanjut setelah… |
 | --- | --- | --- |
 | **i. Tampilan user interface** | Hero **UTS Kelompok 6**, judul **Klasifikasi adanya indikasi kebakaran**, menu Prediksi foto, Cara penggunaan, dan Tentang model. Tunjukkan area pilih foto, antrean, serta panel hasil. | Penonton memahami tujuan aplikasi dan letak input serta output. |
@@ -12,4 +14,4 @@ Rekam sesuai urutan berikut. Tiga foto contoh tersedia dalam folder `foto_predik
 
 Skor objek bukan persentase kepastian kebakaran. Kotak merupakan gabungan batas prediksi per kelas, bukan Grad-CAM. Akurasi 90,50% berlaku pada data test D-Fire, bukan jaminan untuk setiap foto baru.
 
-Bukti ambang berasal dari eksperimen model lanjutan pada bobot yang sama: baris **Lanjutan, ambang awal** dan **Lanjutan, ambang kontrol** dalam `perbandingan_biner_test.csv`. Hasil ambang final juga terdapat di evaluasi notebook. Panduan ini merupakan bahan rekaman; video tetap perlu direkam dan tautannya dicantumkan pada laporan.
+Bukti ambang berasal dari eksperimen model lanjutan pada bobot yang sama: baris **Lanjutan, ambang awal** dan **Lanjutan, ambang kontrol** dalam [perbandingan_biner_test.csv](tools/perbandingan_biner_test.csv), salinan hasil eksperimen sebelumnya. Hasil ambang final juga terdapat di evaluasi notebook. Panduan ini merupakan bahan rekaman; video tetap perlu direkam dan tautannya dicantumkan pada laporan.

@@ -2,6 +2,8 @@
 
 **Klasifikasi Biner Adanya Indikasi Kebakaran atau Tidak Pada Citra**
 
+Website: [Klasifikasi adanya indikasi kebakaran — UTS Kelompok 6](https://klasifikasi-adanya-indikasi-kebakar.vercel.app/).
+
 ## Latar belakang
 
 Api dan asap adalah petunjuk visual yang dapat digunakan untuk mengenali indikasi kebakaran pada sebuah gambar. Namun, warna saja belum cukup untuk membedakannya. Objek berwarna terang dapat terlihat seperti api, sedangkan awan atau kabut dapat menyerupai asap.
