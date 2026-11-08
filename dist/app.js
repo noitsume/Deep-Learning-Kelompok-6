@@ -158,7 +158,7 @@ function render() {
   $('#totalBadge').textContent = `${state.items.length} foto`;
   $('#clearAll').disabled = !state.items.length || state.running;
   $('#loadExamples').disabled = loadingExamples || state.running;
-  $('#loadExamples').textContent = loadingExamples ? 'Memuat foto demo…' : 'Muat 3 foto demo';
+  $('#loadExamples').textContent = loadingExamples ? 'Mengambil foto…' : 'Ambil Foto Testing';
   $('#mergeBoxes').disabled = state.running;
   $('#chooseFiles').disabled = state.running;
   $('#fileInput').disabled = state.running;
