@@ -12,8 +12,8 @@ import onnxruntime as ort
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT.parent / "kandidat_2_fokus" / "hasil_20261104_163407"
-NOTEBOOK = SOURCE.parent / "Kandidat_2_Fokus.ipynb"
+SOURCE = ROOT.parents[1] / "UTS FINAL" / "Kelompok 6-Source Code" / "output" / "step7_model"
+NOTEBOOK = SOURCE.parents[1] / "UTS-Notebook.ipynb"
 OUT = ROOT / "dist" / "model"
 QA = ROOT / ".qa"
 OUT.mkdir(parents=True, exist_ok=True)
@@ -52,9 +52,9 @@ for cell in notebook["cells"]:
                 exec(compile(ast.Module(body=[node], type_ignores=[]), "notebook", "exec"), namespace)
 postprocess = namespace["prediksi_kotak"]
 
-downloads = Path.home() / "Downloads"
-photos = [downloads / name for name in ["IMG-20260824-WA0016.jpg", "hari-pohon-sedunia.webp", "images3.jpeg"]]
-test_dir = ROOT.parent / "data" / "extracted" / "data" / "test" / "images"
+photo_dir = SOURCE.parents[1] / "foto_prediksi"
+photos = [photo_dir / name for name in ["IMG-20260824-WA0016.jpg", "hari-pohon-sedunia.webp", "images3.jpeg"]]
+test_dir = SOURCE.parents[1] / "data" / "extracted" / "data" / "test" / "images"
 test_photos = sorted(test_dir.glob("*"))
 if test_photos:
     photos += [test_photos[i] for i in np.linspace(0, len(test_photos)-1, 9, dtype=int)]
@@ -91,7 +91,7 @@ for i, path in enumerate(photos):
     print(f"{path.name}: score error {score_error:.8f}, boxes {len(expected_boxes)}, match {classes_match}", flush=True)
 
 assert before == {path: sha(Path(path)) for path in before}, "Source files changed"
-manifest = dict(name="D-Fire · Kelompok 6", notebook="Kandidat_2_Fokus.ipynb",
+manifest = dict(name="D-Fire · Kelompok 6", notebook="UTS-Notebook.ipynb",
                 run="hasil_20261104_163407", height=128, width=192, classes=["asap", "api"],
                 threshold=.2, nms_iou=.5, nms_candidate_threshold=.01, max_detections=100,
                 box_std=[.1,.1,.2,.2], preprocessing="RGB → bilinear 192×128 → float32 (0–255)",

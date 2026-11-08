@@ -1,6 +1,6 @@
 # Catatan teknis website D-Fire
 
-Website untuk mencoba **model final dari `Kandidat_2_Fokus.ipynb`** menggunakan foto sendiri. Tidak ada login, training, atau pengiriman foto ke server. Prediksi dijalankan di browser pengunjung.
+Website untuk mencoba **model final dari `UTS-Notebook.ipynb`** menggunakan foto sendiri. Tidak ada login, training, atau pengiriman foto ke server. Prediksi dijalankan di browser pengunjung.
 
 ## Menjalankan di komputer sendiri
 
@@ -25,7 +25,7 @@ Tema mengikuti perangkat saat pertama dibuka, lalu menyimpan pilihan terang/gela
 
 ## Model dan kesesuaian dengan notebook
 
-Sumber bobot: `../kandidat_2_fokus/hasil_20261104_163407/model.keras`, hasil retraining 4 November 2026. Bukan checkpoint lama `model_terbaik.keras`.
+Model web menggunakan bobot final hasil training 4 November 2026. Identitas sumber dan checksum tersimpan di `dist/model/manifest.json`. Untuk ekspor ulang, skrip membaca `output/step7_model/model.keras` dari proyek `UTS-Notebook.ipynb` setelah training selesai.
 
 | Komponen | Nilai |
 | --- | --- |

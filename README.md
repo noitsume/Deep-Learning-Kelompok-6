@@ -8,7 +8,7 @@ Website: [Klasifikasi adanya indikasi kebakaran — UTS Kelompok 6](https://klas
 
 Api dan asap adalah petunjuk visual yang dapat digunakan untuk mengenali indikasi kebakaran pada sebuah gambar. Namun, warna saja belum cukup untuk membedakannya. Objek berwarna terang dapat terlihat seperti api, sedangkan awan atau kabut dapat menyerupai asap.
 
-Melalui proyek ini, kelompok kami menggunakan Convolutional Neural Network (CNN) untuk mempelajari pola pada citra dan menghasilkan dua kemungkinan: **ada indikasi kebakaran** atau **tidak ada indikasi kebakaran**. Dataset yang digunakan adalah [D-Fire](https://github.com/gaia-solutions-on-demand/DFireDataset), yang menyediakan gambar beserta label api, asap, dan koordinat bounding box. Model menggunakan MobileNetV2 dengan transfer learning dan fine-tuning, sesuai implementasi pada notebook final `Kandidat_2_Fokus.ipynb`.
+Melalui proyek ini, kelompok kami menggunakan Convolutional Neural Network (CNN) untuk mempelajari pola pada citra dan menghasilkan dua kemungkinan: **ada indikasi kebakaran** atau **tidak ada indikasi kebakaran**. Dataset yang digunakan adalah [D-Fire](https://github.com/gaia-solutions-on-demand/DFireDataset), yang menyediakan gambar beserta label api, asap, dan koordinat bounding box. Model menggunakan MobileNetV2 dengan transfer learning dan fine-tuning, sesuai implementasi pada notebook final `UTS-Notebook.ipynb`.
 
 Website ini dibuat agar pengguna dapat mencoba model dengan foto mereka sendiri. Selain label biner, website menampilkan kotak pada area yang diprediksi sebagai api atau asap. Secara default, kotak dari kelas yang sama digabung untuk tampilan, sehingga maksimal ada dua kotak pada satu foto. Checkbox **Gabungkan kotak sekelas** dapat dimatikan untuk menampilkan kotak yang lolos secara terpisah; NMS dan keputusan biner tetap sama.
 
@@ -16,7 +16,7 @@ Model final memperoleh akurasi klasifikasi biner **90,50% pada 4.306 gambar test
 
 ## Source code notebook
 
-Unduh [Source Code.zip](source%20code/Source%20Code.zip) dari folder `source code` untuk menjalankan ulang proyek UTS. Pada halaman berkas GitHub, gunakan **Download raw file**, lalu ekstrak seluruh ZIP. Buka folder `Kelompok 6-Source Code`, pilih kernel Python 3.11 atau 3.12 versi 64-bit, kemudian jalankan **Restart Kernel → Run All** pada `Kandidat_2_Fokus.ipynb`. Petunjuk lengkap ada di README dalam ZIP.
+Unduh [Source Code.zip](source%20code/Source%20Code.zip) dari folder `source code` untuk menjalankan ulang proyek UTS. Pada halaman berkas GitHub, gunakan **Download raw file**, lalu ekstrak seluruh ZIP. Buka folder `Kelompok 6-Source Code`, pilih kernel Python 3.11 atau 3.12 versi 64-bit, kemudian jalankan **Restart Kernel → Run All** pada `UTS-Notebook.ipynb`. Petunjuk lengkap ada di README dalam ZIP.
 
 Paket berisi notebook dengan output tersimpan, requirements, tiga foto contoh, hasil evaluasi, serta struktur `output/step5_training` sampai `output/step8_prediksi`. Dataset, bobot awal, model hasil training, isi cache, dan backup tidak disertakan. Saat Run All, notebook mengunduh dataset dan bobot awal yang belum tersedia, lalu membuat cache dan melatih model. Hasil setiap tahap menimpa berkas pada folder output yang sama.
 
