@@ -24,7 +24,7 @@ Website untuk deployment Vercel tetap berada di `dist/`. ZIP ini digunakan untuk
 
 ## Cara penggunaan website
 
-1. **Masukkan foto.** Klik **Pilih foto** atau tarik berkas ke area unggahan. Kamu bisa memasukkan beberapa foto sekaligus. Format yang didukung adalah JPG, PNG, dan WebP, dengan batas 25 foto dalam antrean, 20 MB dan 40 megapiksel per foto.
+1. **Masukkan foto.** Klik **Pilih foto** atau tarik berkas ke area unggahan. Tombol **Muat 3 foto demo** menambahkan contoh api, pohon, dan kucing untuk presentasi; semuanya diproses melalui model yang sama. Kamu bisa memasukkan beberapa foto sekaligus. Format yang didukung adalah JPG, PNG, dan WebP, dengan batas 25 foto dalam antrean, 20 MB dan 40 megapiksel per foto.
 2. **Mulai prediksi.** Klik **Mulai prediksi**. Pada penggunaan pertama, browser akan mengunduh model dan runtime sekitar 24 MB. Indikator menampilkan tahap pemuatan model, pembacaan foto, preprocessing, prediksi, dan pengolahan hasil.
 3. **Pilih hasil yang ingin dilihat.** Setiap foto diberi nomor pada daftar. Klik salah satunya untuk melihat label, skor api/asap, dan bounding box. Kotak oranye menandai api, sedangkan kotak biru menandai asap. Skor yang ditampilkan adalah keluaran model, bukan persentase kepastian kebakaran.
 4. **Bandingkan dengan foto asli.** Tombol **Foto asli** menyembunyikan kotak, sedangkan **Hasil prediksi** menampilkannya kembali. Filter pada daftar foto membantu menampilkan hasil dengan indikasi, tanpa indikasi, foto yang belum selesai, atau berkas yang gagal dibaca.

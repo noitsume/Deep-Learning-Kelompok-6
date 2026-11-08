@@ -78,6 +78,26 @@ function addFiles(files) {
 }
 $('#chooseFiles').addEventListener('click', () => $('#fileInput').click());
 $('#fileInput').addEventListener('change', event => addFiles([...event.target.files]));
+let loadingExamples = false;
+$('#loadExamples').addEventListener('click', async () => {
+  if (loadingExamples || state.running) return;
+  if (state.items.length > 22) { notice('Sisakan tiga tempat di antrean untuk foto demo. Batas antrean adalah 25 foto.'); return; }
+  loadingExamples = true; notice(); render();
+  try {
+    const examples = ['IMG-20260824-WA0016.jpg', 'hari-pohon-sedunia.webp', 'images3.jpeg'];
+    const files = await Promise.all(examples.map(async name => {
+      const response = await fetch(new URL(`./examples/${name}`, import.meta.url));
+      if (!response.ok) throw new Error('Foto demo tidak tersedia.');
+      const blob = await response.blob();
+      return new File([blob], name, { type:blob.type });
+    }));
+    addFiles(files);
+  } catch {
+    notice('Foto demo belum berhasil dimuat. Periksa koneksi internet atau pilih foto dari perangkat.');
+  } finally {
+    loadingExamples = false; render();
+  }
+});
 let dragDepth = 0;
 $('#dropzone').addEventListener('dragenter', event => { event.preventDefault(); dragDepth++; $('#dropzone').classList.add('dragging'); });
 $('#dropzone').addEventListener('dragover', event => event.preventDefault());
@@ -136,6 +156,8 @@ function render() {
   const errors = state.items.filter(item=>item.status === 'error').length;
   $('#totalBadge').textContent = `${state.items.length} foto`;
   $('#clearAll').disabled = !state.items.length || state.running;
+  $('#loadExamples').disabled = loadingExamples || state.running;
+  $('#loadExamples').textContent = loadingExamples ? 'Memuat foto demo…' : 'Muat 3 foto demo';
   $('#exportAll').disabled = !done.length;
   $('#runButton').disabled = state.running || !(pendingItems().length || errors);
   $('#runButton').innerHTML = state.running ? '<span class="busy-spinner"></span>Memproses…' : `${done.length && !pendingItems().length && !errors ? 'Semua selesai' : done.length ? 'Lanjutkan' : errors && !pendingItems().length ? 'Coba ulang' : 'Mulai prediksi'}${icon('arrow')}`;
