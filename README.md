@@ -12,6 +12,14 @@ Website ini dibuat agar pengguna dapat mencoba model dengan foto mereka sendiri.
 
 Model final memperoleh akurasi klasifikasi biner **90,50% pada 4.306 gambar test D-Fire**. Angka tersebut adalah hasil pada data test, sehingga prediksi pada foto baru tetap bisa salah. Website memakai bobot model yang sudah dilatih, tanpa melakukan training saat digunakan.
 
+## Source code notebook
+
+Unduh [D-Fire-Kelompok-6.zip](source%20code/D-Fire-Kelompok-6.zip) dari folder `source code` untuk menjalankan ulang proyek UTS. Pada halaman berkas GitHub, gunakan **Download raw file**, lalu ekstrak seluruh ZIP. Buka folder `D-Fire-Kelompok-6`, pilih kernel Python 3.11 atau 3.12 versi 64-bit, kemudian jalankan **Restart Kernel → Run All** pada `Kandidat_2_Fokus.ipynb`. Petunjuk lengkap ada di README dalam ZIP.
+
+Paket berisi notebook dengan output tersimpan, requirements, tiga foto contoh, hasil evaluasi, serta struktur `output/step5_training` sampai `output/step8_prediksi`. Dataset, bobot awal, model hasil training, isi cache, dan backup tidak disertakan. Saat Run All, notebook mengunduh dataset dan bobot awal yang belum tersedia, lalu membuat cache dan melatih model. Hasil setiap tahap menimpa berkas pada folder output yang sama.
+
+Website untuk deployment Vercel tetap berada di `dist/`. ZIP ini digunakan untuk menjalankan notebook di komputer sendiri.
+
 ## Cara penggunaan website
 
 1. **Masukkan foto.** Klik **Pilih foto** atau tarik berkas ke area unggahan. Kamu bisa memasukkan beberapa foto sekaligus. Format yang didukung adalah JPG, PNG, dan WebP, dengan batas 25 foto dalam antrean, 20 MB dan 40 megapiksel per foto.
