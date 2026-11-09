@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, access } from 'node:fs/promises';
-import { decode, mergeForDisplay } from '../dist/postprocess.js';
+import { applyOptions, decode, mergeForDisplay } from '../dist/postprocess.js';
 import { resizeRGB } from '../dist/preprocess.js';
 
 const base = new URL('../', import.meta.url);
@@ -35,6 +35,25 @@ test('Union OFF tetap memakai NMS dan tidak mengubah skor atau keputusan biner',
     const negative=decode(raw,testAnchors,manifest,merge);
     assert.equal(negative.positive,false); assert.deepEqual(negative.boxes,[]);
   }
+});
+
+test('applyOptions menyaring ulang kandidat pasca-NMS secara langsung saat ambang atau union diubah',()=>{
+  const testAnchors=new Float32Array([.2,.2,.2,.2, .7,.7,.2,.2]);
+  // logit -1.29 -> sigmoid ~0.2158 (seperti kasus foto kucing), logit -0.11 -> sigmoid ~0.4725 (kebakaran)
+  const raw=new Float32Array([0,0,0,0,-1.29,-10, 0,0,0,0,-0.11,-10]);
+  const initial=decode(raw,testAnchors,manifest,true,0.20);
+  assert.equal(initial.positive,true);
+  assert.equal(initial.detections.length,2);
+  assert.equal(initial.boxes.length,1);
+
+  const stricter=applyOptions(initial.nmsCandidates,initial.maxScores,{threshold:0.35,mergeBoxes:false});
+  assert.equal(stricter.positive,true);
+  assert.equal(stricter.detections.length,1,'Kandidat 0,216 tersaring pada ambang 0,35 sedangkan 0,473 tetap lolos');
+  assert.equal(stricter.boxes.length,1);
+
+  const catOnly=applyOptions([initial.nmsCandidates[1]],[0.216,0.093],{threshold:0.35,mergeBoxes:true});
+  assert.equal(catOnly.positive,false,'Kasus skor 0,216 menjadi negatif pada ambang 0,35 tanpa hitung ulang ONNX');
+  assert.deepEqual(catOnly.boxes,[]);
 });
 
 try { await access(new URL('.qa/fixtures.json',base)); } catch { fixturePresent=false; }

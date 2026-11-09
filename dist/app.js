@@ -1,7 +1,10 @@
+import { applyOptions } from './postprocess.js';
+
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
 const state = { items:[], nextIndex:1, selected:null, running:false, ready:false, worker:null,
-  active:null, config:null, runOptions:{ mergeBoxes:true }, follow:true, showBoxes:true, bitmap:null, bitmapId:null, drawTicket:0 };
+  active:null, config:null, runtime:null, runOptions:{ threshold:0.20, mergeBoxes:true }, follow:true, showBoxes:true, bitmap:null, bitmapId:null, drawTicket:0 };
+const fmtThreshold = value => value.toFixed(2).replace('.', ',');
 const names = ['Asap','Api'];
 const colors = ['#29c8f3','#ff743e'];
 const pad = number => String(number).padStart(2, '0');
@@ -159,6 +162,12 @@ function render() {
   $('#clearAll').disabled = !state.items.length || state.running;
   $('#loadExamples').disabled = loadingExamples || state.running;
   $('#loadExamples').textContent = loadingExamples ? 'Mengambil foto…' : 'Ambil Foto Testing';
+  $('#thresholdInput').disabled = state.running;
+  $$('.preset-chip').forEach(chip => {
+    chip.disabled = state.running;
+    chip.classList.toggle('active', Math.abs(Number(chip.dataset.threshold) - state.runOptions.threshold) < 1e-4);
+  });
+  $('#thresholdValue').textContent = fmtThreshold(state.runOptions.threshold);
   $('#mergeBoxes').disabled = state.running;
   $('#chooseFiles').disabled = state.running;
   $('#fileInput').disabled = state.running;
@@ -172,7 +181,41 @@ function render() {
   $('#batchProgress').value = done.length + errors;
   $('#modelState').className = `model-state${state.running ? ' busy' : state.ready ? ' ready' : ''}`;
   $('#modelState').innerHTML = `<span class="status-dot"></span>${state.running ? 'Memproses di browser' : state.ready ? 'Model siap digunakan' : 'Model siap dimuat'}`;
+  renderRuntime();
 }
+
+function renderRuntime() {
+  const bar = $('#runtimeBar');
+  if (!state.ready || !state.runtime || !state.config) { bar.hidden = true; return; }
+  bar.hidden = false;
+  const mb = (state.runtime.modelBytes / 1048576).toFixed(2).replace('.', ',');
+  const ortVer = state.config.export?.onnxruntime ?? '1.31.1';
+  const opset = state.config.export?.opset ?? 17;
+  const sha = state.runtime.shaVerified ? 'SHA-256 terverifikasi' : 'WebAssembly aktif';
+  bar.innerHTML = `<span class="runtime-pill"><span class="small-dot"></span><strong>Inferensi lokal ONNX aktif</strong></span><span>ONNX Runtime Web ${ortVer} (WASM · Web Worker)</span><span>model.onnx · ${mb} MB · opset ${opset} · ${sha}</span><span>Data foto terkirim ke server: <strong>0 B</strong></span>`;
+}
+
+function syncOptions(threshold = state.runOptions.threshold, mergeBoxes = $('#mergeBoxes').checked) {
+  const clamped = Math.round(Math.max(0.05, Math.min(0.60, Number(threshold))) * 100) / 100;
+  state.runOptions = { threshold:clamped, mergeBoxes };
+  $('#thresholdInput').value = clamped.toFixed(2);
+  let updated = false;
+  for (const item of state.items) {
+    if (item.status === 'done' && item.result?.nmsCandidates) {
+      const next = applyOptions(item.result.nmsCandidates, item.result.maxScores, state.runOptions);
+      item.result = { ...item.result, ...next };
+      updated = true;
+    }
+  }
+  if (updated && !visibleItems().some(item => item.id === state.selected)) {
+    state.selected = visibleItems()[0]?.id ?? null;
+  }
+  render();
+  if (updated) renderViewer();
+}
+$('#thresholdInput').addEventListener('input', event => syncOptions(event.target.value, $('#mergeBoxes').checked));
+$$('.preset-chip').forEach(chip => chip.addEventListener('click', () => syncOptions(chip.dataset.threshold, $('#mergeBoxes').checked)));
+$('#mergeBoxes').addEventListener('change', event => syncOptions(state.runOptions.threshold, event.target.checked));
 
 function reportPhase(name, detail) {
   $('#progressText').textContent = detail;
@@ -185,7 +228,7 @@ function makeWorker() {
   worker.onmessage = ({ data }) => {
     if (state.worker !== worker) return;
     if (data.type === 'phase') reportPhase(data.name, data.detail);
-    if (data.type === 'ready') { state.config = data.config; state.ready = true; processNext(); }
+    if (data.type === 'ready') { state.config = data.config; state.runtime = data.runtime ?? null; state.ready = true; renderRuntime(); processNext(); }
     if (data.type === 'result') {
       const item = state.items.find(item=>item.id === data.id);
       if (item) { item.result = data.result; item.status = 'done'; item.error = null; }
@@ -218,7 +261,7 @@ function processNext() {
   item.status = 'processing'; state.active = item.id;
   if (state.follow) state.selected = item.id;
   render(); renderViewer();
-  state.worker.postMessage({ type:'predict', file:item.file, id:item.id, mergeBoxes:state.runOptions.mergeBoxes });
+  state.worker.postMessage({ type:'predict', file:item.file, id:item.id, mergeBoxes:state.runOptions.mergeBoxes, threshold:state.runOptions.threshold });
 }
 
 $('#runButton').addEventListener('click', () => {
@@ -227,7 +270,7 @@ $('#runButton').addEventListener('click', () => {
     notice('Browser ini belum mendukung mesin prediksi. Gunakan Chrome, Edge, atau Firefox versi terbaru.'); return;
   }
   notice();
-  state.runOptions = { mergeBoxes:$('#mergeBoxes').checked };
+  state.runOptions = { threshold:Math.round(Number($('#thresholdInput').value) * 100) / 100, mergeBoxes:$('#mergeBoxes').checked };
   state.items.forEach(item=>{ item.status = 'pending'; item.result = null; item.error = null; });
   state.running = true; state.follow = true; $('#filter').value = 'all';
   $('#progressPanel').hidden = false; $('#stopButton').hidden = false;
@@ -241,7 +284,7 @@ $('#runButton').addEventListener('click', () => {
 });
 
 function stop(announce = true) {
-  state.worker?.terminate(); state.worker = null; state.ready = false; state.running = false;
+  state.worker?.terminate(); state.worker = null; state.ready = false; state.runtime = null; state.running = false;
   const active = state.items.find(item=>item.id === state.active);
   if (active) active.status = 'pending';
   state.active = null; $('#stopButton').hidden = true;
@@ -317,14 +360,22 @@ function renderResult(item) {
   const label = element('div','result-label');
   const verdict = element('span',`verdict ${result.positive ? 'positive' : 'negative'}`);
   verdict.innerHTML = icon(result.positive ? 'flame' : 'check'); verdict.append(document.createTextNode(result.positive ? 'Ada indikasi kebakaran' : 'Tidak ada indikasi kebakaran'));
-  label.append(verdict, element('span','inference-time',`${(result.elapsedMs/1000).toFixed(2).replace('.',',')} detik`)); panel.append(label);
+  const timing = result.inferenceMs !== undefined
+    ? `Preprocess ${Math.round(result.preprocessMs)} ms · Inferensi ONNX ${Math.round(result.inferenceMs)} ms`
+    : `${(result.elapsedMs/1000).toFixed(2).replace('.',',')} detik`;
+  label.append(verdict, element('span','inference-time',timing)); panel.append(label);
   const scores = element('div','result-scores');
   for (const c of [1,0]) {
     const score = element('div','score-cell'); score.append(element('i',`legend-dot ${c ? 'fire' : 'smoke'}`),element('span','',names[c]), element('strong','',result.maxScores[c].toFixed(3).replace('.',',')));
     scores.append(score);
   }
   panel.append(scores);
-  panel.append(element('p','result-note',`Skor tertinggi per kelas, bukan persentase kepastian. Ambang: 0,20. ${result.detections.length} kotak lolos → ${result.boxes.length} kotak tampilan. ${result.mergeBoxes ? 'Union ON: kotak sekelas digabung.' : 'Union OFF: kotak setelah NMS ditampilkan terpisah.'}`));
+  const activeThreshold = result.threshold ?? state.runOptions.threshold;
+  const isDefaultThreshold = Math.abs(activeThreshold - (state.config?.threshold ?? 0.2)) < 1e-4;
+  const thresholdNote = isDefaultThreshold
+    ? `Ambang: ${fmtThreshold(activeThreshold)} (bawaan evaluasi).`
+    : `Ambang aktif: ${fmtThreshold(activeThreshold)} (simulasi; evaluasi utama memakai 0,20).`;
+  panel.append(element('p','result-note',`Skor tertinggi per kelas, bukan persentase kepastian. ${thresholdNote} ${result.detections.length} kotak lolos → ${result.boxes.length} kotak tampilan. ${result.mergeBoxes ? 'Union ON: kotak sekelas digabung.' : 'Union OFF: kotak setelah NMS ditampilkan terpisah.'}`));
 }
 
 function drawImage() {
@@ -369,11 +420,14 @@ $('#exportAll').addEventListener('click',()=>{
   const output = {
     exported_at:new Date().toISOString(), model:state.config,
     coordinate_format:'normalized xyxy (0–1); pixel coordinates = x*width and y*height',
-    prediction_options:{ merge_boxes:state.runOptions.mergeBoxes },
+    prediction_options:{ threshold:state.runOptions.threshold, merge_boxes:state.runOptions.mergeBoxes },
     display_boxes:state.runOptions.mergeBoxes ? 'Enclosing union per class, applied after NMS and score filtering' : 'Separate detections after NMS and score filtering; no union',
-    photos:state.items.map(item=>({ index:item.index, file:item.file.name, status:item.status,
-      label:item.result ? (item.result.positive ? 'Ada indikasi kebakaran' : 'Tidak ada indikasi kebakaran') : null,
-      result:item.result ?? null, error:item.error ?? null }))
+    photos:state.items.map(item=>{
+      const exportedResult = item.result ? (({ nmsCandidates, ...rest }) => rest)(item.result) : null;
+      return { index:item.index, file:item.file.name, status:item.status,
+        label:item.result ? (item.result.positive ? 'Ada indikasi kebakaran' : 'Tidak ada indikasi kebakaran') : null,
+        result:exportedResult, error:item.error ?? null };
+    })
   };
   download(new Blob([JSON.stringify(output,null,2)],{type:'application/json'}),`d-fire-hasil-${new Date().toISOString().slice(0,10)}.json`);
   toast('Hasil prediksi disimpan sebagai JSON.');

@@ -11,7 +11,20 @@ export function iou(a, b) {
   return union > 0 ? intersection / union : 0;
 }
 
-export function decode(raw, anchors, config, mergeBoxes = true) {
+export function applyOptions(nmsCandidates, maxScores, { threshold = 0.2, mergeBoxes = true } = {}) {
+  const detections = nmsCandidates.filter(p => p.score >= threshold);
+  return {
+    positive: detections.length > 0,
+    maxScores,
+    threshold,
+    mergeBoxes,
+    nmsCandidates,
+    detections,
+    boxes: mergeBoxes ? mergeForDisplay(detections) : detections,
+  };
+}
+
+export function decode(raw, anchors, config, mergeBoxes = true, threshold = config.threshold) {
   const candidates = [[], []];
   const maxScores = [0, 0];
   for (let i = 0; i < anchors.length / 4; i++) {
@@ -43,10 +56,8 @@ export function decode(raw, anchors, config, mergeBoxes = true) {
     }
     selected.push(...kept);
   }
-  const detections = selected.sort((a,b) => b.score-a.score).slice(0, config.max_detections)
-    .filter(p => p.score >= config.threshold);
-  return { positive: detections.length > 0, maxScores, detections, mergeBoxes,
-    boxes: mergeBoxes ? mergeForDisplay(detections) : detections };
+  const nmsCandidates = selected.sort((a,b) => b.score-a.score).slice(0, config.max_detections);
+  return applyOptions(nmsCandidates, maxScores, { threshold, mergeBoxes });
 }
 
 // Penggabungan per kelas hanya untuk tampilan: maksimal satu kotak asap dan satu api.

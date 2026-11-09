@@ -25,6 +25,7 @@ async function download(url, label) {
 }
 
 async function initialize() {
+  const initStart = performance.now();
   phase('model', 'Menyiapkan mesin prediksi di browser…');
   const response = await fetch('./model/manifest.json');
   if (!response.ok) throw new Error('Konfigurasi model tidak dapat dimuat.');
@@ -33,9 +34,11 @@ async function initialize() {
   if (!anchorResponse.ok) throw new Error('Anchor model tidak dapat dimuat.');
   anchors = new Float32Array(await anchorResponse.arrayBuffer());
   const model = await download('./model/model.onnx', 'Mengunduh model');
+  let shaVerified = false;
   if (crypto.subtle) {
     const hash = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', model)), b => b.toString(16).padStart(2,'0')).join('');
     if (hash !== config.onnx_sha256) throw new Error('Berkas model tidak sesuai checksum. Muat ulang halaman.');
+    shaVerified = true;
   }
   const wasm = await download('./vendor/ort-wasm-simd-threaded.wasm', 'Mengunduh runtime');
   ort.env.wasm.numThreads = 1;
@@ -43,10 +46,20 @@ async function initialize() {
   ort.env.wasm.wasmBinary = wasm;
   phase('model', 'Memuat bobot model…');
   session = await ort.InferenceSession.create(model, { executionProviders:['wasm'], graphOptimizationLevel:'all' });
-  postMessage({ type:'ready', config });
+  postMessage({
+    type:'ready',
+    config,
+    runtime:{
+      provider:'wasm',
+      modelBytes:model.byteLength,
+      wasmBytes:wasm.byteLength,
+      shaVerified,
+      initMs:performance.now() - initStart,
+    },
+  });
 }
 
-async function predict(file, id, mergeBoxes) {
+async function predict(file, id, mergeBoxes, threshold) {
   const start = performance.now();
   phase('decode', `Membaca ${file.name}`, { id });
   let bitmap;
@@ -62,14 +75,17 @@ async function predict(file, id, mergeBoxes) {
   const pixels = context.getImageData(0, 0, width, height).data;
   const input = resizeRGB(pixels, width, height, config.width, config.height);
   canvas.width = canvas.height = 1;
+  const preprocessMs = performance.now() - start;
   phase('inference', 'Model sedang mencari indikasi api dan asap…', { id });
+  const inferStart = performance.now();
   const tensor = new ort.Tensor('float32', input, [1, config.height, config.width, 3]);
   let outputs;
   try {
     outputs = await session.run({ [session.inputNames[0]]:tensor });
+    const inferenceMs = performance.now() - inferStart;
     phase('boxes', mergeBoxes ? 'Menyaring prediksi dan menggabungkan kotak per kelas…' : 'Menyaring prediksi tanpa penggabungan kotak…', { id });
-    const result = decode(outputs[session.outputNames[0]].data, anchors, config, mergeBoxes);
-    postMessage({ type:'result', id, result:{ ...result, width, height, elapsedMs:performance.now()-start } });
+    const result = decode(outputs[session.outputNames[0]].data, anchors, config, mergeBoxes, threshold ?? config.threshold);
+    postMessage({ type:'result', id, result:{ ...result, width, height, preprocessMs, inferenceMs, elapsedMs:performance.now()-start } });
   } finally {
     tensor.dispose();
     if (outputs) Object.values(outputs).forEach(output => output.dispose());
@@ -79,7 +95,7 @@ async function predict(file, id, mergeBoxes) {
 self.onmessage = async ({ data }) => {
   try {
     if (data.type === 'init') await initialize();
-    if (data.type === 'predict') await predict(data.file, data.id, data.mergeBoxes);
+    if (data.type === 'predict') await predict(data.file, data.id, data.mergeBoxes, data.threshold);
   } catch (error) {
     postMessage({ type:'error', id:data.id, fatal:data.type === 'init', message:error.message || 'Prediksi gagal diproses.' });
   }
