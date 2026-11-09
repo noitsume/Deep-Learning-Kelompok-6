@@ -1,36 +1,58 @@
-# Deep Learning — Kelompok 6
+# Klasifikasi adanya indikasi kebakaran atau tidak pada citra
 
-**Klasifikasi Biner Adanya Indikasi Kebakaran atau Tidak Pada Citra**
+Proyek UTS Pembelajaran Mendalam Kelompok 6. Aplikasi ini menganalisis foto untuk menghasilkan label **Ada indikasi kebakaran** atau **Tidak ada indikasi kebakaran**, disertai skor dan kotak pada area yang diprediksi sebagai api atau asap.
 
-Website: [Klasifikasi adanya indikasi kebakaran — UTS Kelompok 6](https://klasifikasi-adanya-indikasi-kebakar.vercel.app/).
+[Buka aplikasi](https://klasifikasi-adanya-indikasi-kebakar.vercel.app/) · [Unduh source code notebook](source%20code/Source%20Code.zip)
 
-## Latar belakang
+## Tujuan dan pendekatan
 
-Api dan asap adalah petunjuk visual yang dapat digunakan untuk mengenali indikasi kebakaran pada sebuah gambar. Namun, warna saja belum cukup untuk membedakannya. Objek berwarna terang dapat terlihat seperti api, sedangkan awan atau kabut dapat menyerupai asap.
+Api dan asap merupakan petunjuk visual adanya indikasi kebakaran. Keduanya memiliki bentuk, warna, dan tekstur yang bervariasi, sehingga model perlu mempelajari pola dari banyak contoh citra.
 
-Melalui proyek ini, kelompok kami menggunakan Convolutional Neural Network (CNN) untuk mempelajari pola pada citra dan menghasilkan dua kemungkinan: **ada indikasi kebakaran** atau **tidak ada indikasi kebakaran**. Dataset yang digunakan adalah [D-Fire](https://github.com/gaia-solutions-on-demand/DFireDataset), yang menyediakan gambar beserta label api, asap, dan koordinat bounding box. Model menggunakan MobileNetV2 dengan transfer learning dan fine-tuning, sesuai implementasi pada notebook final `UTS-Notebook.ipynb`.
+Proyek ini menggunakan Convolutional Neural Network (CNN) dengan MobileNetV2, transfer learning, dan fine-tuning pada dataset [D-Fire](https://github.com/gaia-solutions-on-demand/DFireDataset). Dataset menyediakan citra beserta kelas api/asap dan koordinat kotaknya. Model memprediksi lokasi serta skor kedua kelas, lalu aplikasi menentukan label biner berdasarkan deteksi yang lolos penyaringan.
 
-Website ini dibuat agar pengguna dapat mencoba model dengan foto mereka sendiri. Selain label biner, website menampilkan kotak pada area yang diprediksi sebagai api atau asap. Secara default, kotak dari kelas yang sama digabung untuk tampilan, sehingga maksimal ada dua kotak pada satu foto. Checkbox **Gabungkan kotak sekelas** dapat dimatikan untuk menampilkan kotak yang lolos secara terpisah; NMS dan keputusan biner tetap sama.
+Website menyediakan cara untuk mencoba hasil pelatihan pada beberapa foto sekaligus. Pengguna dapat memeriksa setiap hasil, membandingkannya dengan foto asli, mengatur penggabungan kotak, dan menyimpan hasil prediksi.
 
-Model final memperoleh akurasi klasifikasi biner **90,50% pada 4.306 gambar test D-Fire**. Angka tersebut adalah hasil pada data test, sehingga prediksi pada foto baru tetap bisa salah. Website memakai bobot model yang sudah dilatih, tanpa melakukan training saat digunakan.
+## Cara menggunakan aplikasi
 
-## Source code notebook
+1. Klik **Pilih foto** atau tarik foto ke area unggahan. Untuk mencoba tiga gambar yang tersedia, klik **Ambil Foto Testing**. Tombol ini menambahkan gambar kebakaran, pohon, dan kucing ke antrean.
+2. Atur checkbox **Gabungkan kotak sekelas**. Jika aktif, kotak api digabung menjadi satu kotak api dan kotak asap menjadi satu kotak asap.
+3. Klik **Mulai prediksi**. Foto yang dipilih sendiri maupun foto testing baru diproses setelah tombol ini ditekan. Saat pertama digunakan, browser memuat model dan mesin prediksi.
+4. Pilih foto dalam daftar untuk melihat label, skor, dan kotaknya. Gunakan **Foto asli** dan **Hasil prediksi** untuk membandingkan tampilan. Kotak oranye menunjukkan api dan kotak biru menunjukkan asap.
+5. Klik **Unduh tampilan** untuk menyimpan gambar sebagai PNG, atau **Ekspor hasil** untuk menyimpan hasil seluruh antrean sebagai JSON. Setelah mengganti konfigurasi, klik **Prediksi ulang** untuk memproses seluruh foto dengan pengaturan terbaru.
 
-Unduh [Source Code.zip](source%20code/Source%20Code.zip) dari folder `source code` untuk menjalankan ulang proyek UTS. Pada halaman berkas GitHub, gunakan **Download raw file**, lalu ekstrak seluruh ZIP. Buka folder `Kelompok 6-Source Code`, pilih kernel Python 3.11 atau 3.12 versi 64-bit, kemudian jalankan **Restart Kernel → Run All** pada `UTS-Notebook.ipynb`. Petunjuk lengkap ada di README dalam ZIP.
+Aplikasi menerima JPG, PNG, dan WebP, dengan maksimal 25 foto dalam antrean. Batas setiap foto adalah 20 MiB dan 40 megapiksel. Foto serta hasil berada dalam memori browser selama halaman terbuka. Tema terang/gelap, filter hasil, dan tombol **Hentikan** tersedia pada antarmuka.
 
-Paket berisi notebook dengan output tersimpan, requirements, tiga foto contoh, hasil evaluasi, serta struktur `output/step5_training` sampai `output/step8_prediksi`. Dataset, bobot awal, model hasil training, isi cache, dan backup tidak disertakan. Saat Run All, notebook mengunduh dataset dan bobot awal yang belum tersedia, lalu membuat cache dan melatih model. Hasil setiap tahap menimpa berkas pada folder output yang sama.
+## Inferensi ONNX di browser
 
-Website untuk deployment Vercel tetap berada di `dist/`. ZIP ini digunakan untuk menjalankan notebook di komputer sendiri.
+Inferensi adalah proses menggunakan model yang sudah dilatih untuk menghitung prediksi pada masukan baru. Dalam aplikasi ini, masukannya berupa foto dan hasilnya berupa skor serta lokasi api/asap.
 
-## Cara penggunaan website
+Model hasil pelatihan TensorFlow/Keras diekspor ke format **ONNX (Open Neural Network Exchange)**. Berkas `model.onnx` menyimpan susunan operasi jaringan dan parameter numerik hasil pelatihan, seperti bobot dan bias. **ONNX Runtime Web** membaca berkas tersebut dan menjalankan perhitungannya melalui WebAssembly di browser. Runtime sudah disertakan dalam aplikasi.
 
-1. **Masukkan foto.** Klik **Pilih foto** atau tarik berkas ke area unggahan. Tombol **Muat 3 foto demo** menambahkan contoh api, pohon, dan kucing untuk presentasi; semuanya diproses melalui model yang sama. Kamu bisa memasukkan beberapa foto sekaligus. Format yang didukung adalah JPG, PNG, dan WebP, dengan batas 25 foto dalam antrean, 20 MB dan 40 megapiksel per foto.
-2. **Atur dan mulai prediksi.** Pilih ON/OFF pada checkbox **Gabungkan kotak sekelas**, lalu klik **Mulai prediksi**. Ikon info di sampingnya menjelaskan kegunaannya saat diarahkan pointer, difokuskan dengan keyboard, atau diketuk. Konfigurasi dibaca setiap tombol prediksi ditekan dan dikunci selama proses. Semua foto diproses ulang saat **Prediksi ulang** ditekan; mengganti checkbox saja tidak mengubah hasil lama. Pada penggunaan pertama, browser akan mengunduh model dan runtime sekitar 24 MB. Indikator menampilkan tahap pemuatan model, pembacaan foto, preprocessing, prediksi, dan pengolahan hasil.
-3. **Pilih hasil yang ingin dilihat.** Setiap foto diberi nomor pada daftar. Klik salah satunya untuk melihat label, skor api/asap, dan bounding box. Kotak oranye menandai api, sedangkan kotak biru menandai asap. Skor yang ditampilkan adalah keluaran model, bukan persentase kepastian kebakaran.
-4. **Bandingkan dengan foto asli.** Tombol **Foto asli** menyembunyikan kotak, sedangkan **Hasil prediksi** menampilkannya kembali. Filter pada daftar foto membantu menampilkan hasil dengan indikasi, tanpa indikasi, foto yang belum selesai, atau berkas yang gagal dibaca.
-5. **Hentikan atau ulangi bila perlu.** Tombol **Hentikan** membatalkan proses yang sedang berjalan. Hasil yang sudah selesai tetap tersedia; tombol prediksi berikutnya memproses ulang seluruh antrean dengan konfigurasi terbaru. Jika satu berkas rusak, foto berikutnya tetap diproses.
-6. **Simpan hasil.** Klik **Unduh tampilan** untuk menyimpan foto yang sedang ditampilkan sebagai PNG. Sisi terpanjang gambar unduhan maksimal 1.800 piksel. Tombol **Ekspor hasil** menyimpan JSON berisi nama foto, status, label, skor, serta koordinat prediksi.
+Alurnya adalah foto → RGB ukuran 192 × 128 piksel → inferensi model → penyaringan kotak → label dan tampilan hasil. Kotak dipilih dengan Non-Maximum Suppression (NMS) dan ambang skor 0,20. Minimal satu kotak api atau asap yang lolos menghasilkan label **Ada indikasi kebakaran**.
 
-Website dapat digunakan tanpa akun. Foto diproses langsung di browser dan tidak dikirim ke server. Foto serta hasil hanya tersimpan selama halaman masih terbuka; kalau halaman dimuat ulang atau ditutup, masukkan kembali fotonya. Tema terang dan gelap dapat diganti melalui tombol pada sidebar.
+Vercel menyajikan berkas aplikasi, model, dan runtime. Perhitungan prediksi berlangsung pada perangkat pengguna, sehingga foto yang dipilih tetap diproses di browser. Penjelasan tahap per tahap tersedia di [dokumentasi teknis](TECHNICAL.md#alur-prediksi).
 
-Untuk menjalankan website di komputer sendiri atau menyiapkan hosting, lihat [panduan deployment](DEPLOY.md). Penjelasan kode, konfigurasi model, dan hasil pemeriksaan tersedia di [catatan teknis](TECHNICAL.md). Urutan rekaman, bagian yang perlu disorot, dan batas selesai setiap poin tersedia di [panduan video](PANDUAN_VIDEO.md).
+## Hasil evaluasi
+
+Model memperoleh akurasi klasifikasi biner **90,50% pada 4.306 citra test D-Fire**. Dari jumlah tersebut, 3.897 citra diklasifikasikan dengan benar, 129 citra tanpa indikasi diprediksi memiliki indikasi, dan 280 citra dengan indikasi terlewat.
+
+Hasil ini mengukur keputusan pada tingkat citra. Prediksi pada foto baru masih dapat keliru; foto kucing yang tersedia pada tombol testing merupakan contoh salah deteksi asap. Skor api/asap menunjukkan keluaran model untuk kandidat objek, sehingga harus dibaca bersama foto dan kotak hasilnya.
+
+Rincian evaluasi, perbandingan ambang, dan pemeriksaan hasil ekspor ONNX tersedia di [TECHNICAL.md](TECHNICAL.md#evaluasi-dan-pemeriksaan-konversi).
+
+## Menjalankan notebook
+
+Unduh [Source Code.zip](source%20code/Source%20Code.zip) melalui **Download raw file** di GitHub, lalu ekstrak seluruh isinya. Buka folder `Kelompok 6-Source Code` dan notebook `UTS-Notebook.ipynb` dengan kernel Python 3.11 atau 3.12 versi 64-bit. Ikuti README dalam paket, kemudian jalankan **Restart Kernel → Run All**.
+
+Paket berisi notebook dengan output tersimpan, requirements, tiga foto contoh, hasil evaluasi, dan struktur folder output. Saat dijalankan, notebook menyiapkan dataset serta bobot awal yang diperlukan, membuat cache, melatih model, dan menyimpan hasilnya. Setiap proses menggunakan folder `output/step5_training` sampai `output/step8_prediksi` yang sama, sehingga hasil run berikutnya menimpa berkas pada lokasi tersebut.
+
+## Isi repository
+
+| Lokasi | Isi |
+| --- | --- |
+| `dist/` | Aplikasi web, model ONNX, anchor, runtime, dan foto testing |
+| `source code/Source Code.zip` | Paket notebook dan hasil eksperimen |
+| `tools/` | Server lokal, ekspor model, dan hasil pemeriksaan konversi |
+| `tests/` | Pengujian preprocessing dan pengolahan kotak |
+| [TECHNICAL.md](TECHNICAL.md) | Arsitektur, inferensi, susunan kode, dan evaluasi |
+| [DEPLOY.md](DEPLOY.md) | Menjalankan aplikasi secara lokal dan menerbitkannya ke Vercel |

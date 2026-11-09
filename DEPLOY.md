@@ -1,40 +1,45 @@
-# Menjalankan dan deploy website
+# Menjalankan dan menerbitkan aplikasi
 
-Alamat produksi: [Klasifikasi adanya indikasi kebakaran — UTS Kelompok 6](https://klasifikasi-adanya-indikasi-kebakar.vercel.app/). Proyek Vercel: `klasifikasi-adanya-indikasi-kebakaran`, terhubung ke branch `main` repository GitHub. Deployment pertama berhasil pada 8 November 2026; akses tanpa login dan prediksi tiga foto contoh sudah diperiksa.
+Alamat aplikasi: [Klasifikasi adanya indikasi kebakaran atau tidak pada citra](https://klasifikasi-adanya-indikasi-kebakar.vercel.app/).
 
-Folder **`dist/` sudah siap disajikan sebagai website statis**. Model ONNX, anchor, dan runtime WASM sudah ikut di repository. Tidak perlu dataset training, TensorFlow, Python, API key, atau server untuk menerima unggahan foto.
+Aplikasi disajikan sebagai website statis dari folder `dist/`. Folder ini memuat halaman, JavaScript, CSS, model ONNX, anchor, dan runtime WebAssembly. Browser mengambil berkas tersebut dari hosting, lalu menjalankan prediksi pada perangkat pengguna.
 
-## Menjalankan di komputer sendiri
+## Menjalankan secara lokal
 
-Pasang Node.js, lalu buka terminal di folder repository dan jalankan:
+Pasang Node.js, buka terminal di folder repository, lalu jalankan:
 
 ```sh
 npm run dev
 ```
 
-Buka **http://127.0.0.1:5173/**. Tidak perlu `npm install` untuk perintah ini karena server lokal hanya memakai modul bawaan Node.js. Jangan membuka `index.html` langsung melalui `file://`; Web Worker perlu disajikan lewat HTTP/HTTPS.
+Buka [http://127.0.0.1:5173/](http://127.0.0.1:5173/). Perintah ini menjalankan `tools/serve.mjs`, yang menggunakan modul bawaan Node.js untuk menyajikan isi `dist/` melalui HTTP. Jalur HTTP ini diperlukan agar browser dapat memuat modul dan Web Worker.
 
-## Vercel
+Pilih foto atau klik **Ambil Foto Testing**, lalu tekan **Mulai prediksi**. Saat model selesai dimuat, aplikasi memproses foto dalam antrean dan menampilkan hasil setiap foto.
 
-1. Import repository **`noitsume/Deep-Learning-Kelompok-6`** ke Vercel.
-2. Gunakan root repository sebagai **Root Directory** dan preset **Other**.
-3. Konfigurasi `vercel.json` sudah menetapkan **Output Directory: `dist`**, tanpa build dan instalasi dependensi. Kalau dashboard menampilkan override pengaturan, samakan dengan konfigurasi tersebut.
-4. Jalankan deployment dari akun Vercel sendiri. Tidak ada environment variable yang wajib diisi.
-5. Setelah berhasil, buka alamat hasil deployment tanpa login dan coba satu foto. Pastikan proses pemuatan model selesai dan label prediksi muncul.
+## Deployment ke Vercel
 
-Untuk hosting statis lainnya, sajikan isi `dist/` melalui HTTPS. Berkas `.mjs` harus disajikan sebagai JavaScript dan `.wasm` sebagai `application/wasm`. Model dan runtime adalah bagian wajib website, jadi jangan mengunggah HTML saja.
+1. Siapkan repository ini pada akun GitHub yang terhubung ke Vercel.
+2. Di Vercel, pilih **Add New → Project**, kemudian impor repository tersebut.
+3. Gunakan root repository sebagai **Root Directory** dan **Other** sebagai preset framework.
+4. Gunakan konfigurasi dari [vercel.json](vercel.json):
 
-Dokumentasi pengaturan: [Vercel — vercel.json](https://vercel.com/docs/project-configuration/vercel-json).
+   | Pengaturan | Nilai |
+   | --- | --- |
+   | Output Directory | `dist` |
+   | Build Command | String kosong (`""`) untuk melewati proses build |
+   | Install Command | String kosong (`""`) untuk melewati instalasi dependensi |
 
-## Jika ingin mengubah kode
+5. Klik **Deploy**. Setelah status **Ready**, buka alamat produksi dan jalankan prediksi untuk memeriksa pemuatan model serta tampilan hasil.
 
-Kode halaman ada di `dist/index.html`, `dist/styles.css`, dan `dist/app.js`. Prediksi dijalankan oleh `dist/engine.worker.js`; preprocessing dan pengolahan kotak ada di berkas tersendiri.
+Model dan runtime sudah tersedia di `dist/`, sehingga Vercel langsung menyajikan berkas aplikasi. Konfigurasi juga menetapkan tipe konten `application/javascript` untuk `.mjs` dan `application/wasm` untuk `.wasm`. Penjelasan pengaturannya tersedia pada [dokumentasi vercel.json](https://vercel.com/docs/project-configuration/vercel-json).
 
-Versi runtime dikunci melalui `package-lock.json`. Jika perlu menyalin ulang runtime dari paket npm:
+Proyek produksi `klasifikasi-adanya-indikasi-kebakaran` terhubung ke branch `main` repository ini. Pembaruan yang didorong ke branch tersebut mengikuti alur deployment Vercel.
 
-```sh
-npm ci
-npm run vendor
-```
+## Memeriksa hasil deployment
 
-Perubahan tampilan tidak membutuhkan training atau ekspor ulang model. Petunjuk ekspor dan bukti kecocokan hasil ada di [TECHNICAL.md](TECHNICAL.md).
+- Buka alamat produksi melalui jendela privat untuk memastikan halaman dapat diakses publik.
+- Klik **Ambil Foto Testing**. Pastikan tiga foto masuk ke antrean, lalu klik **Mulai prediksi** dan tunggu hasilnya.
+- Periksa label, skor, dan kotak tiap foto. Ubah checkbox **Gabungkan kotak sekelas**, tekan **Prediksi ulang**, lalu periksa perubahan kotak tampilan.
+- Coba **Unduh tampilan** dan **Ekspor hasil** untuk memeriksa keluaran PNG dan JSON.
+
+Untuk memperbarui salinan runtime sesuai versi di `package-lock.json`, jalankan `npm ci` kemudian `npm run vendor`. Struktur kode dan proses ekspor model dijelaskan di [TECHNICAL.md](TECHNICAL.md).
