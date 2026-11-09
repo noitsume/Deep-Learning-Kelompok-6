@@ -52,6 +52,7 @@ Paket berisi notebook dengan output tersimpan, requirements, tiga foto contoh, h
 | --- | --- |
 | `dist/` | Aplikasi web, model ONNX, anchor, runtime, dan foto testing |
 | `source code/Source Code.zip` | Paket notebook dan hasil eksperimen |
+| [Laporan/](Laporan/) | Laporan teknis UTS dalam format [Word](Laporan/UTS-Laporan.docx) dan [PDF](Laporan/UTS-Laporan.pdf) |
 | `tools/` | Server lokal, ekspor model, dan hasil pemeriksaan konversi |
 | `tests/` | Pengujian preprocessing dan pengolahan kotak |
 | [TECHNICAL.md](TECHNICAL.md) | Arsitektur, inferensi, susunan kode, dan evaluasi |
