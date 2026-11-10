@@ -113,7 +113,79 @@
       <div class="eyebrow"><span></span> TENTANG PROYEK</div><h1>Model yang kami gunakan.</h1><p class="lead">Klasifikasi Biner Adanya Indikasi Kebakaran atau Tidak Pada Citra.</p>
       <div class="model-intro"><span class="model-mark"><svg class="icon"><use href="#i-flame"/></svg></span><div><h2>CNN dengan MobileNetV2</h2><p>Kelompok kami memakai bobot hasil training dan fine-tuning pada notebook <code>UTS-Notebook.ipynb</code>. Model mempelajari kelas api/asap beserta koordinat dari dataset D-Fire.</p></div></div>
       <dl class="spec-grid"><div><dt>Masukan model</dt><dd>192 × 128 <span>piksel RGB</span></dd></div><div><dt>Akurasi biner pada data test</dt><dd>90,50% <span>dari 4.306 citra</span></dd></div><div><dt>Ambang skor</dt><dd>0,20 <span>NMS IoU 0,50</span></dd></div><div><dt>Bobot final</dt><dd>4 Nov 2026 <span>hasil retraining notebook</span></dd></div></dl>
-      <article class="explanation"><h2>Dari foto menjadi prediksi</h2><p>Foto dibaca sebagai RGB, di-resize dengan bilinear menjadi 192 × 128, lalu diubah ke float32 dalam rentang 0–255. Tidak ada Gaussian blur atau CLAHE tambahan. Cabang kontras lokal dan normalisasi MobileNet sudah menjadi bagian di dalam model.</p><h2>Fitur 1: Penyaringan dengan ambang skor</h2><p>Model menghasilkan skor api/asap dan perubahan koordinat anchor. NMS menyaring kotak yang bertumpuk. Pada ambang bawaan 0,20, jika ada minimal satu kotak berskor ≥ 0,20 yang lolos, hasil binernya adalah <b>Ada indikasi</b>; jika tidak, <b>Tidak ada indikasi</b>. Pengatur ambang di halaman prediksi memungkinkan pengujian sensitivitas secara langsung pada kandidat pasca-NMS.</p><p>Pada eksperimen dengan bobot yang sama dan 4.306 citra test, ambang 0,20 mengurangi kasus positif yang terlewat dari 791 menjadi 280 dibanding ambang 0,35. Konsekuensinya, alarm salah meningkat dari 18 menjadi 129. Ambang ini dipilih untuk meningkatkan kemampuan menemukan indikasi; hasil tetap perlu diperiksa.</p><h2>Apa arti kotak dan skornya?</h2><p>Saat checkbox <b>Gabungkan kotak sekelas</b> aktif, kotak pada layar adalah gabungan batas terluar prediksi untuk kelas yang sama. Matikan checkbox untuk langsung menampilkan seluruh kotak hasil penyaringan NMS secara terpisah. NMS, ambang skor, dan keputusan biner tetap sama. Satu kotak besar dapat mencakup ruang di antara beberapa indikasi. Kotak ini berasal dari keluaran detektor, bukan dari CAM atau segmentasi piksel.</p><p>Skor menunjukkan keluaran model untuk kandidat objek, bukan persentase kepastian kebakaran. Akurasi 90,50% adalah hasil klasifikasi biner pada data test D-Fire; angka tersebut tidak mengukur ketepatan koordinat dan tidak menjamin hasil pada semua foto baru.</p><h2>Fitur 2: Prediksi langsung di browser</h2><p>Bobot Keras diekspor ke ONNX float32 tanpa training ulang atau kuantisasi. Perhitungan berjalan pada perangkat pengunjung melalui ONNX Runtime Web. Hasil konversi diperiksa terhadap model TensorFlow. Decoder gambar browser dapat memberi perbedaan piksel kecil, terutama pada JPEG, dibandingkan Pillow di notebook.</p><p>Foto tetap berada di perangkat pengguna. Pada pemeriksaan konversi terhadap 12 contoh, kelas prediksi cocok dengan acuan TensorFlow dan selisih skor maksimum sekitar 0,00000332. Browser tetap perlu mengunduh model dan runtime saat pertama digunakan.</p><p class="source-links"><a href="https://github.com/gaia-solutions-on-demand/DFireDataset" target="_blank" rel="noopener noreferrer">Dataset D-Fire ↗</a><a href="./model/manifest.json" target="_blank" rel="noopener noreferrer">Identitas & checksum model ↗</a></p></article>
+      <article class="explanation">
+        <h2>Alur kerja dari klik tombol hingga hasil</h2>
+        <p>Proses terbagi menjadi dua fase terpisah. <b>Fase persiapan developer (offline)</b> dijalankan satu kali melalui <code>tools/export_model.py</code> untuk mengekspor bobot <code>model.keras</code> dari notebook menjadi <code>model.onnx</code>, <code>anchors.bin</code>, dan <code>manifest.json</code> tanpa training ulang. Saat aplikasi dibuka pengunjung, Python tidak lagi terlibat.</p>
+        <p><b>Fase prediksi di browser (runtime)</b> berjalan sepenuhnya di memori perangkat pengunjung ketika tombol <b>Mulai prediksi</b> ditekan:</p>
+        <ol class="flow-steps" aria-label="Tahapan eksekusi prediksi di browser">
+          <li><span class="flow-num">01</span><div><strong>Antarmuka &amp; antrean lokal</strong><span><code>index.html</code> + <code>app.js</code></span><p>Menahan berkas foto di RAM tab menggunakan <code>URL.createObjectURL</code>, lalu mengirim objek <code>File</code> ke Web Worker lewat <code>postMessage</code> tanpa unggahan jaringan.</p></div></li>
+          <li><span class="flow-num">02</span><div><strong>Preprocessing piksel</strong><span><code>engine.worker.js</code> → <code>preprocess.js</code></span><p>Membaca foto sebagai RGB, me-resize bilinear dua tahap menjadi <code>192 × 128</code> float32 (rentang 0–255). Cabang kontras lokal dan normalisasi MobileNetV2 sudah menyatu di dalam graf model.</p></div></li>
+          <li><span class="flow-num">03</span><div><strong>Inferensi ONNX WebAssembly</strong><span><code>ort.wasm.min.mjs</code> + <code>ort-wasm-simd-threaded.*</code></span><p>Mengeksekusi <code>model.onnx</code> pada CPU browser (SIMD aktif di Web Worker) dan menghasilkan tensor keluaran <code>[1, 3456, 6]</code>, lalu langsung membebaskan memori tensor.</p></div></li>
+          <li><span class="flow-num">04</span><div><strong>Dekode anchor, NMS &amp; ambang</strong><span><code>postprocess.js</code> + <code>anchors.bin</code></span><p>Menerjemahkan 3.456 anchor menjadi koordinat kotak, menyaring tumpukan dengan NMS, menentukan label biner pada ambang skor, dan opsional membungkus kotak tampilan.</p></div></li>
+          <li><span class="flow-num">05</span><div><strong>Render ke kanvas</strong><span><code>engine.worker.js</code> → <code>app.js</code> → <code>&lt;canvas&gt;</code></span><p>Worker mengirim hasil kembali ke thread utama untuk menggambar kotak api/asap, skor tertinggi, serta menyediakan unduhan PNG/JSON langsung dari memori browser.</p></div></li>
+        </ol>
+
+        <h2>Apa itu 3.456 Anchor (<code>anchors.bin</code>)?</h2>
+        <p>Lapisan konvolusi bekerja secara lokal sehingga kurang stabil jika dipaksa menebak koordinat mutlak dari nol untuk banyak objek sekaligus. Sebagai patokan, bidang citra <code>128 × 192</code> dibagi menjadi grid <code>16 × 24</code> (384 titik pusat), dan tiap titik dipasangi <b>9 ukuran cetakan kotak</b>—mulai dari titik api kecil <code>(0,03 × 0,04)</code>, kobaran besar <code>(0,80 × 0,85)</code>, hingga rasio memanjang khusus kepulan asap dan lidah api.</p>
+        <p>Totalnya ada <code>16 × 24 × 9 = 3.456</code> kotak patokan tetap. Untuk tiap anchor, <code>model.onnx</code> mengeluarkan 4 koreksi bentuk <code>(dx, dy, dw, dh)</code> dengan pengali <code>box_std [0,1, 0,1, 0,2, 0,2]</code> serta 2 nilai logit kelas (asap dan api) yang diubah fungsi sigmoid menjadi skor <code>0–1</code>.</p>
+
+        <h2>Fitur 1: Penyaringan dengan ambang skor</h2>
+        <p>Kandidat anchor dengan skor minimal <code>0,01</code> disaring terlebih dahulu oleh NMS. Pada ambang bawaan <code>0,20</code>, jika ada minimal satu kotak pasca-NMS berskor ≥ <code>0,20</code>, keputusan binernya adalah <b>Ada indikasi</b>; jika tidak, <b>Tidak ada indikasi</b>. Pengatur ambang di halaman prediksi memungkinkan pengujian sensitivitas secara langsung pada kandidat pasca-NMS tanpa menjalankan ulang model ONNX.</p>
+        <p>Pada eksperimen dengan bobot yang sama dan 4.306 citra test, ambang 0,20 mengurangi kasus positif yang terlewat dari 791 menjadi 280 dibanding ambang 0,35. Konsekuensinya, alarm salah meningkat dari 18 menjadi 129. Ambang ini dipilih untuk meningkatkan kemampuan menemukan indikasi; hasil tetap perlu diperiksa.</p>
+
+        <h2>Bedanya NMS vs. Enclosing Union</h2>
+        <p>Proyek ini menerapkan <b>keduanya secara berurutan</b> untuk tugas yang berbeda—bukan memilih salah satu. Kebingungan sering muncul karena istilah <i>Union</i> dipakai pada rumus <i>Intersection over Union (IoU)</i> di dalam NMS, sekaligus sebagai nama penggabungan kotak tampilan (<i>Enclosing Union</i>):</p>
+        <div class="compare-grid">
+          <div class="compare-card">
+            <span class="compare-tag required">Tahap 1 · Wajib &amp; Selalu Aktif</span>
+            <h3>Non-Maximum Suppression (NMS)</h3>
+            <p>Menghapus kotak <b>duplikat yang saling bertumpuk</b> (<code>IoU &gt; 0,50</code>) pada objek yang sama dan hanya menyimpan kotak berskor tertinggi. Jika ada dua titik api yang terpisah jauh (<code>IoU = 0</code>), NMS <b>mempertahankan keduanya</b> sebagai dua kotak terpisah.</p>
+          </div>
+          <div class="compare-card">
+            <span class="compare-tag optional">Tahap 2 · Opsional Khusus Visual</span>
+            <h3>Enclosing Union (Gabungkan kotak)</h3>
+            <p>Berjalan <b>setelah</b> NMS dan ambang skor selesai. Jika checkbox aktif, seluruh kotak lolos dari kelas yang sama dibungkus batas terluarnya <code>[min(x1), min(y1), max(x2), max(y2)]</code> menjadi maksimal 1 kotak api dan 1 kotak asap. Skor dan keputusan biner tidak berubah.</p>
+          </div>
+        </div>
+        <figure class="nms-diagram" aria-label="Ilustrasi urutan kandidat anchor, hasil NMS, dan penggabungan Enclosing Union">
+          <div class="diagram-stage">
+            <span class="stage-caption">1. Kandidat anchor awal</span>
+            <svg viewBox="0 0 180 104" aria-hidden="true">
+              <rect x="1" y="1" width="178" height="102" rx="6" class="frame"/>
+              <rect x="18" y="22" width="52" height="54" rx="3" class="box-ghost"/>
+              <rect x="25" y="28" width="50" height="52" rx="3" class="box-ghost"/>
+              <rect x="21" y="25" width="52" height="53" rx="3" class="box-main"/>
+              <rect x="116" y="34" width="44" height="42" rx="3" class="box-main"/>
+            </svg>
+            <small>Banyak anchor menumpuk di titik api kiri + 1 di kanan.</small>
+          </div>
+          <div class="diagram-stage">
+            <span class="stage-caption">2. Setelah NMS (Union OFF)</span>
+            <svg viewBox="0 0 180 104" aria-hidden="true">
+              <rect x="1" y="1" width="178" height="102" rx="6" class="frame"/>
+              <rect x="21" y="25" width="52" height="53" rx="3" class="box-main"/>
+              <rect x="116" y="34" width="44" height="42" rx="3" class="box-main"/>
+            </svg>
+            <small>Tumpukan kiri disaring sisa 1; 2 lokasi api tetap terpisah.</small>
+          </div>
+          <div class="diagram-stage">
+            <span class="stage-caption">3. Enclosing Union (Union ON)</span>
+            <svg viewBox="0 0 180 104" aria-hidden="true">
+              <rect x="1" y="1" width="178" height="102" rx="6" class="frame"/>
+              <rect x="21" y="25" width="52" height="53" rx="3" class="box-inner"/>
+              <rect x="116" y="34" width="44" height="42" rx="3" class="box-inner"/>
+              <rect x="21" y="25" width="139" height="53" rx="3" class="box-main"/>
+            </svg>
+            <small>Dibungkus batas terluar sekelas; dapat mencakup ruang di antaranya.</small>
+          </div>
+        </figure>
+        <p>Skor menunjukkan keluaran model untuk kandidat objek, bukan persentase kepastian kebakaran. Akurasi 90,50% adalah hasil klasifikasi biner pada data test D-Fire; angka tersebut tidak mengukur ketepatan koordinat dan tidak menjamin hasil pada semua foto baru.</p>
+
+        <h2>Fitur 2: Prediksi langsung di browser &amp; privasi</h2>
+        <p>Bobot Keras diekspor ke ONNX float32 tanpa training ulang atau kuantisasi, lalu dijalankan melalui ONNX Runtime Web (<code>dist/vendor/</code>) yang disajikan langsung dari domain aplikasi agar tidak bergantung pada CDN luar. Karena server hanya mengirim berkas statis satu arah dan tidak memiliki endpoint penerima unggahan, setiap pengunjung memproses fotonya di memori perangkat sendiri tanpa kebocoran antar-pengguna.</p>
+        <p>Pada pemeriksaan konversi terhadap 12 contoh acuan TensorFlow, kelas prediksi cocok seluruhnya dengan selisih skor maksimum sekitar 0,00000332. Decoder gambar browser tetap dapat memberi perbedaan piksel sangat kecil pada JPEG dibandingkan Pillow di notebook.</p>
+        <p class="source-links"><a href="https://github.com/gaia-solutions-on-demand/DFireDataset" target="_blank" rel="noopener noreferrer">Dataset D-Fire ↗</a><a href="./model/manifest.json" target="_blank" rel="noopener noreferrer">Identitas &amp; checksum model ↗</a></p>
+      </article>
     </section>
     <footer class="main-footer"><span>D-FIRE <span class="footer-separator">/</span> KELOMPOK 6</span><span>Proyek UTS Pembelajaran Mendalam</span></footer>
   </main>
