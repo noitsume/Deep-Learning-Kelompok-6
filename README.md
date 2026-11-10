@@ -1,4 +1,4 @@
-# Klasifikasi adanya indikasi kebakaran atau tidak pada citra
+# Klasifikasi Biner adanya indikasi kebakaran atau tidak pada citra
 
 Proyek UTS Pembelajaran Mendalam Kelompok 6. Aplikasi ini menganalisis foto untuk menghasilkan label **Ada indikasi kebakaran** atau **Tidak ada indikasi kebakaran**, disertai skor dan kotak pada area yang diprediksi sebagai api atau asap.
 
